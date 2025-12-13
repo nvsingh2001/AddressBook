@@ -5,7 +5,7 @@ namespace AddressBook;
 // city, state, zip, phone number and
 // email…
 
-public class Contact(string firstName, string lastName,long phone,string email = "", string address = "",
+public class Contact(string firstName, string lastName,string phone,string email = "", string address = "",
     string city = "", string state = "", string zip = "")
 {
     public string FirstName { get; set; } = firstName;
@@ -14,7 +14,7 @@ public class Contact(string firstName, string lastName,long phone,string email =
     public string City { get; set; } = city;
     public string State { get; set; } = state;
     public string Zip { get; set; } = zip;
-    public long Phone { get; set; } = phone;
+    public string Phone { get; set; } = phone;
     public string Email { get; set; } = email;
 
     public override string ToString()
