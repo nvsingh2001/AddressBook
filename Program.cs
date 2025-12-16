@@ -26,6 +26,7 @@ class Program
         Console.WriteLine("[1] Add Contact");
         Console.WriteLine("[2] Display Contacts");
         Console.WriteLine("[3] Edit Contact");
+        Console.WriteLine("[4] Delete Contacts");
         Console.WriteLine("[q] Quit");
         Console.Write("\n\nEnter your choice: ");
     }
@@ -243,6 +244,40 @@ class Program
                         else
                         {
                             Console.WriteLine("Contact Not found!");
+                        }
+                    }
+                    break;
+                case '4':
+                    Console.Clear();
+                    Console.Clear();
+                    PrintWelcomeScreen();
+                    if (Contacts.IsEmpty())
+                    {
+                        Console.WriteLine("No Contact to edit");
+                    }
+                    else
+                    {
+                        string firstName = GetValidatedInput(
+                            "Enter first name: ",
+                            input => !string.IsNullOrWhiteSpace(input),
+                            "First name cannot be empty",
+                            isRequired: true
+                        );
+                        
+                        string lastName = GetValidatedInput(
+                            "Enter last name: ",
+                            input => !string.IsNullOrWhiteSpace(input),
+                            "Last name cannot be empty",
+                            isRequired: true
+                        );
+
+                        if (Contacts.DeleteContact(firstName + lastName))
+                        {
+                            Console.WriteLine("Contact Deleted!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Contact Not Found!");
                         }
                     }
                     break;

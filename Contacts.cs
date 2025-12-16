@@ -46,6 +46,25 @@ internal class Contacts(int capacity)
             }
         }
     }
+
+    public bool DeleteContact(string name)
+    {
+        for(int i = 0; i < _capacity; i++)
+        {
+            if (_contacts[i] == null)
+            {
+                continue;
+            }
+            
+            if (_contacts[i].FirstName + _contacts[i].LastName == name)
+            {
+                _contacts[i] = null;
+                NumOfContacts--;
+                return true;
+            }
+        }
+        return false;
+    }
     
     public bool IsEmpty()
     {
