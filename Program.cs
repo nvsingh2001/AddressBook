@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AddressBook;
 
 class Program
 {
+    private static readonly Contacts Contacts = new Contacts(100);
     static void PrintWelcomeScreen()
     {
         string banner = @"
@@ -24,127 +24,170 @@ class Program
         Console.WriteLine("WELCOME TO YOUR ADDRESS BOOK");
         Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Add Contact");
-        Console.WriteLine("[2] Display Contact");
+        Console.WriteLine("[2] Display Contacts");
+        Console.WriteLine("[3] Edit Contact");
         Console.WriteLine("[q] Quit");
         Console.Write("\n\nEnter your choice: ");
     }
 
-    static Contact createContact()
+
+    static void DisplayEditMenu()
     {
-        string firstName = "";
-        string lastName = "";
-        string phoneNumber = "";
-        string email = "";
-        string address = "";
-        string city = "";
-        string state = "";
-        string zip = "";
-        
+        Console.Clear();
+        PrintWelcomeScreen();
+        Console.WriteLine("[1] Edit First Name");
+        Console.WriteLine("[2] Edit Last Name");
+        Console.WriteLine("[3] Edit Phone Number");
+        Console.WriteLine("[4] Edit Email");
+        Console.WriteLine("[5] Edit Address");
+        Console.WriteLine("[6] Edit City");
+        Console.WriteLine("[7] Edit State");
+        Console.WriteLine("[8] Edit Zip");
+        Console.WriteLine("[9] Exit");
+        Console.Write("\n\nEnter your choice: ");
+    }
+
+    static void EditContactField(Contact contact, int choice)
+    {
         var phoneRegex = new Regex(@"^\+[1-9][0-9]{7,14}$");
         var emailRegex = new Regex(@"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-z]{2,}$");
         
-        Console.Clear();
-        PrintWelcomeScreen();
-        Console.WriteLine("\nAdd Contact");
+        switch (choice)
+        {
+            case 1:
+                contact.FirstName = GetValidatedInput(
+                    "Enter new first name: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "First name cannot be empty",
+                    isRequired: true
+                );
+                break;
+            case 2:
+                contact.LastName = GetValidatedInput(
+                    "Enter new last name: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "Last name cannot be empty",
+                    isRequired: true
+                );
+                break;
+            case 3:
+                contact.Phone = GetValidatedInput(
+                    "Enter new phone number: ",
+                    input => !string.IsNullOrWhiteSpace(input) && phoneRegex.IsMatch(input),
+                    "Phone number cannot be empty or invalid",
+                    isRequired: true
+                );
+                break;
+            case 4:
+                contact.Email = GetValidatedInput(
+                    "Enter new email: ",
+                    input => string.IsNullOrWhiteSpace(input) || emailRegex.IsMatch(input),
+                    "Email is invalid",
+                    isRequired: false
+                );
+                break;
+            case 5:
+                Console.Write("Enter new address: ");
+                contact.Address = Console.ReadLine();
+                break;
+            case 6:
+                Console.Write("Enter new city: ");
+                contact.City = Console.ReadLine();
+                break;
+            case 7:
+                Console.Write("Enter new state: ");
+                contact.State = Console.ReadLine();
+                break;
+            case 8:
+                Console.Write("Enter new zip: ");
+                contact.Zip = Console.ReadLine();
+                break;
+        }
+        Console.WriteLine("Contact Edited Successfully!");
+    }
+
+    static Contact CollectContactInformation()
+    {
+        var phoneRegex = new Regex(@"^\+[1-9][0-9]{7,14}$");
+        var emailRegex = new Regex(@"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-z]{2,}$");
         
-        do
-        {
-            try
-            {
-                Console.Write("Enter first name: ");
-                firstName = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(firstName))
-                {
-                    throw new Exception("First name cannot be empty");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        } while (string.IsNullOrWhiteSpace(firstName));
+        string firstName = GetValidatedInput(
+            "Enter first name: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "First name cannot be empty",
+            isRequired: true
+        );
         
-        do
-        {
-            try
-            {
-                Console.Write("Enter last name: ");
-                lastName = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(lastName))
-                {
-                    throw new Exception("Last name cannot be empty");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        } while (string.IsNullOrWhiteSpace(lastName));
-
-        do
-        {
-            try
-            {
-                Console.Write("Enter phone number: ");
-                phoneNumber = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(phoneNumber))
-                {
-                    throw new Exception("Phone number cannot be empty");
-                }
-
-                if (!phoneRegex.IsMatch(phoneNumber))
-                {
-                    throw new Exception("Phone number is invalid");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        } while (string.IsNullOrWhiteSpace(phoneNumber) || !phoneRegex.IsMatch(phoneNumber));
-
-        do
-        {
-            try
-            {
-                Console.Write("Enter email: ");
-                email = Console.ReadLine();
-
-                if (string.IsNullOrWhiteSpace(email))
-                {
-                    break;
-                }
-
-                if (!emailRegex.IsMatch(email))
-                {
-                    throw new Exception("Email is invalid");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }while (!emailRegex.IsMatch(email));
+        string lastName = GetValidatedInput(
+            "Enter last name: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "Last name cannot be empty",
+            isRequired: true
+        );
+        
+        string phoneNumber = GetValidatedInput(
+            "Enter phone number: ",
+            input => !string.IsNullOrWhiteSpace(input) && phoneRegex.IsMatch(input),
+            "Phone number cannot be empty or invalid",
+            isRequired: true
+        );
+        
+        string email = GetValidatedInput(
+            "Enter email: ",
+            input => string.IsNullOrWhiteSpace(input) || emailRegex.IsMatch(input),
+            "Email is invalid",
+            isRequired: false
+        );
         
         Console.Write("Enter address: ");
-        address = Console.ReadLine();
+        string address = Console.ReadLine();
         
         Console.Write("Enter city: ");
-        city = Console.ReadLine();
+        string city = Console.ReadLine();
         
         Console.Write("Enter state: ");
-        state = Console.ReadLine();
+        string state = Console.ReadLine();
         
         Console.Write("Enter zip: ");
-        zip = Console.ReadLine();
+        string zip = Console.ReadLine();
         
         return new Contact(firstName, lastName, phoneNumber, email, address, city, state, zip);
     }
-    
+
+    static string GetValidatedInput(string prompt, Func<string, bool> validator, string errorMessage, bool isRequired)
+    {
+        string input;
+        do
+        {
+            try
+            {
+                Console.Write('\n'+prompt);
+                input = Console.ReadLine();
+                
+                if (!isRequired && string.IsNullOrWhiteSpace(input))
+                {
+                    return input;
+                }
+                
+                if (!validator(input))
+                {
+                    throw new Exception(errorMessage);
+                }
+                
+                return input;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                input = null;
+            }
+        } while (true);
+    }
     static void Main(string[] args)
     {
-        Contact contact = null;
+        Contacts.AddContact(new Contact("Naman","Singh","+917908254373","nvsingh2001@hotmail.com","Matelli Bazar","Jalpaiguri", "West Bengal","735223"));
+        Contacts.AddContact(new Contact("Ankit", "Kumar", "+91790825425","ankitkumar25@gmail.com","Bihar", "Bihar", "Bihar", "800001"));
+        
         do
         {
             Console.Clear();
@@ -153,31 +196,62 @@ class Program
             switch(Console.ReadKey().KeyChar)
             {
                 case '1':
-                    contact = createContact();
                     Console.Clear();
                     PrintWelcomeScreen();
-                    PrintMenu();
+                    Contacts.AddContact(CollectContactInformation());
                     break;
                 case '2':
                     Console.Clear();
                     PrintWelcomeScreen();
-                    if (contact == null)
+                    if (Contacts.IsEmpty())
                     {
                         Console.WriteLine("Contact Not Created!");
-                        Console.WriteLine("Press any key to continue . . . ");
-                        Console.ReadKey();
                     }
                     else
                     {
-                        Console.WriteLine(contact);
-                        Console.WriteLine("Press any key to continue . . . ");
-                        Console.ReadKey();
+                        Contacts.PrintAllContacts();
+                    }
+                    break;
+                case '3':
+                    Console.Clear();
+                    PrintWelcomeScreen();
+                    if (Contacts.IsEmpty())
+                    {
+                        Console.WriteLine("No Contact to edit");
+                    }
+                    else
+                    {
+                        string firstName = GetValidatedInput(
+                            "Enter first name: ",
+                            input => !string.IsNullOrWhiteSpace(input),
+                            "First name cannot be empty",
+                            isRequired: true
+                        );
+                        
+                        string lastName = GetValidatedInput(
+                            "Enter last name: ",
+                            input => !string.IsNullOrWhiteSpace(input),
+                            "Last name cannot be empty",
+                            isRequired: true
+                        );
+
+                        if (Contacts.TryGetContact(firstName + lastName, out var contact))
+                        {
+                            DisplayEditMenu();
+                            EditContactField(contact,int.Parse(Console.ReadKey().KeyChar.ToString()));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Contact Not found!");
+                        }
                     }
                     break;
                 case 'q':
                     Environment.Exit(0);
                     break;
             }
+            Console.WriteLine("Press any key to continue . . . ");
+            Console.ReadKey();
         }while(true);
     }
 }
