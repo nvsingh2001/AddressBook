@@ -1,12 +1,14 @@
 ﻿using System.Text.RegularExpressions;
+using System.Xml.Schema;
 
 namespace AddressBook;
 
 class Program
 {
-    private static readonly Contacts Contacts = new Contacts(100);
+    private static readonly Dictionary<string, Contacts> AddressBooks = new Dictionary<string, Contacts>();
     static void PrintWelcomeScreen()
     {
+        Console.Clear();
         string banner = @"
   ___      _     _                    ______             _    
  / _ \    | |   | |                   | ___ \           | |   
@@ -19,7 +21,7 @@ class Program
         Console.WriteLine(banner);
     }
 
-    static void PrintMenu()
+    static void PrintAddressBookMenu()
     {
         Console.WriteLine("WELCOME TO YOUR ADDRESS BOOK");
         Console.WriteLine("------------------------------");
@@ -184,39 +186,40 @@ class Program
             }
         } while (true);
     }
-    static void Main(string[] args)
+
+    static void OpenAddressBook(Contacts contacts)
     {
-        Contacts.AddContact(new Contact("Naman","Singh","+917908254373","nvsingh2001@hotmail.com","Matelli Bazar","Jalpaiguri", "West Bengal","735223"));
-        Contacts.AddContact(new Contact("Ankit", "Kumar", "+91790825425","ankitkumar25@gmail.com","Bihar", "Bihar", "Bihar", "800001"));
-        
+        char choice; 
         do
         {
-            Console.Clear();
             PrintWelcomeScreen();
-            PrintMenu();
-            switch(Console.ReadKey().KeyChar)
+            PrintAddressBookMenu();
+            choice = Console.ReadKey().KeyChar;
+            switch (choice)
             {
                 case '1':
                     Console.Clear();
                     PrintWelcomeScreen();
-                    Contacts.AddContact(CollectContactInformation());
+                    contacts.AddContact(CollectContactInformation());
                     break;
                 case '2':
                     Console.Clear();
                     PrintWelcomeScreen();
-                    if (Contacts.IsEmpty())
+                    if (contacts.IsEmpty())
                     {
                         Console.WriteLine("Contact Not Created!");
                     }
                     else
                     {
-                        Contacts.PrintAllContacts();
+                        contacts.PrintAllContacts();
                     }
+                    Console.WriteLine("\n\nPress any key to continue");
+                    Console.ReadKey();
                     break;
                 case '3':
                     Console.Clear();
                     PrintWelcomeScreen();
-                    if (Contacts.IsEmpty())
+                    if (contacts.IsEmpty())
                     {
                         Console.WriteLine("No Contact to edit");
                     }
@@ -228,7 +231,7 @@ class Program
                             "First name cannot be empty",
                             isRequired: true
                         );
-                        
+
                         string lastName = GetValidatedInput(
                             "Enter last name: ",
                             input => !string.IsNullOrWhiteSpace(input),
@@ -236,22 +239,24 @@ class Program
                             isRequired: true
                         );
 
-                        if (Contacts.TryGetContact(firstName + lastName, out var contact))
+                        if (contacts.TryGetContact(firstName + lastName, out var contact))
                         {
                             DisplayEditMenu();
-                            EditContactField(contact,int.Parse(Console.ReadKey().KeyChar.ToString()));
+                            EditContactField(contact, int.Parse(Console.ReadKey().KeyChar.ToString()));
                         }
                         else
                         {
                             Console.WriteLine("Contact Not found!");
                         }
                     }
+                    Console.WriteLine("\n\nPress any key to continue");
+                    Console.ReadKey();
                     break;
                 case '4':
                     Console.Clear();
                     Console.Clear();
                     PrintWelcomeScreen();
-                    if (Contacts.IsEmpty())
+                    if (contacts.IsEmpty())
                     {
                         Console.WriteLine("No Contact to edit");
                     }
@@ -263,7 +268,7 @@ class Program
                             "First name cannot be empty",
                             isRequired: true
                         );
-                        
+
                         string lastName = GetValidatedInput(
                             "Enter last name: ",
                             input => !string.IsNullOrWhiteSpace(input),
@@ -271,7 +276,7 @@ class Program
                             isRequired: true
                         );
 
-                        if (Contacts.DeleteContact(firstName + lastName))
+                        if (contacts.DeleteContact(firstName + lastName))
                         {
                             Console.WriteLine("Contact Deleted!");
                         }
@@ -280,13 +285,86 @@ class Program
                             Console.WriteLine("Contact Not Found!");
                         }
                     }
+                    Console.WriteLine("\n\nPress any key to continue");
+                    Console.ReadKey();
                     break;
                 case 'q':
-                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("\nInvalid Input");
+                    Console.WriteLine("Press any key to continue . . . ");
+                    Console.ReadKey();
                     break;
             }
-            Console.WriteLine("Press any key to continue . . . ");
-            Console.ReadKey();
+        } while (choice != 'q');
+    }
+    
+    static void MainMenu()
+    {
+        Console.Clear();
+        PrintWelcomeScreen();
+        Console.WriteLine("Main Menu:");
+        Console.WriteLine("[A] Create a Address Book");
+        Console.WriteLine("[B] Open a Address Book");
+        Console.WriteLine("[C] Exit");
+        Console.Write("\n\nEnter your choice: ");
+    }
+
+    static void CreateAddressBook()
+    {
+        string addressBookName = GetValidatedInput(
+            "Enter address book name: ",
+            input => !string.IsNullOrWhiteSpace(input) && !AddressBooks.ContainsKey(input),
+            "Address Book name cannot be empty or Cannot be duplicate.",
+            true
+        );
+        
+        AddressBooks.Add(addressBookName, new Contacts(100));
+        Console.WriteLine($"{addressBookName} created!");
+    }
+    static void Main(string[] args)
+    {
+        Contacts contacts1 = new Contacts(100);
+        contacts1.AddContact(new Contact("Naman","Singh","+917908254373","nvsingh2001@hotmail.com","Matelli Bazar","Jalpaiguri", "West Bengal","735223"));
+        contacts1.AddContact(new Contact("Ankit", "Kumar", "+91790825425","ankitkumar25@gmail.com","Bihar", "Bihar", "Bihar", "800001"));
+        
+        AddressBooks.Add("addressbook1", contacts1);
+        
+        do
+        {
+            MainMenu();
+            switch (Console.ReadKey().KeyChar)
+            {
+                case 'A':
+                    PrintWelcomeScreen();
+                    CreateAddressBook();
+                    break;
+                case 'B':
+                    PrintWelcomeScreen();
+                    if (AddressBooks.Count == 0)
+                    {
+                        Console.WriteLine("No Address Books created!");
+                    }
+                    else
+                    {
+                        string AddressBookName = GetValidatedInput(
+                            "Enter address book name: ",
+                            input => !string.IsNullOrWhiteSpace(input) &&  AddressBooks.ContainsKey(input),
+                            "Address Book name cannot be empty or Does Not Exists",
+                            true
+                        );
+                        OpenAddressBook(AddressBooks[AddressBookName]);
+                    }
+                    break;
+                case 'C':
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("\nInvalid Input");
+                    Console.WriteLine("Press any key to continue . . . ");
+                    Console.ReadKey();
+                    break;
+            }
         }while(true);
     }
 }

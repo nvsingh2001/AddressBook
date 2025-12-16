@@ -27,7 +27,7 @@ internal class Contacts(int capacity)
 
     public void PrintAllContacts()
     {
-        foreach (Contact contact in _contacts)
+        foreach (var contact in _contacts)
         {
             Console.WriteLine(contact.ToString());
         }
