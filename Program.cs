@@ -38,15 +38,13 @@ class Program
     {
         Console.Clear();
         PrintWelcomeScreen();
-        Console.WriteLine("[1] Edit First Name");
-        Console.WriteLine("[2] Edit Last Name");
-        Console.WriteLine("[3] Edit Phone Number");
-        Console.WriteLine("[4] Edit Email");
-        Console.WriteLine("[5] Edit Address");
-        Console.WriteLine("[6] Edit City");
-        Console.WriteLine("[7] Edit State");
-        Console.WriteLine("[8] Edit Zip");
-        Console.WriteLine("[9] Exit");
+        Console.WriteLine("[1] Edit Phone Number");
+        Console.WriteLine("[2] Edit Email");
+        Console.WriteLine("[3] Edit Address");
+        Console.WriteLine("[3] Edit City");
+        Console.WriteLine("[4] Edit State");
+        Console.WriteLine("[5] Edit Zip");
+        Console.WriteLine("[6] Exit");
         Console.Write("\n\nEnter your choice: ");
     }
 
@@ -58,22 +56,6 @@ class Program
         switch (choice)
         {
             case 1:
-                contact.FirstName = GetValidatedInput(
-                    "Enter new first name: ",
-                    input => !string.IsNullOrWhiteSpace(input),
-                    "First name cannot be empty",
-                    isRequired: true
-                );
-                break;
-            case 2:
-                contact.LastName = GetValidatedInput(
-                    "Enter new last name: ",
-                    input => !string.IsNullOrWhiteSpace(input),
-                    "Last name cannot be empty",
-                    isRequired: true
-                );
-                break;
-            case 3:
                 contact.Phone = GetValidatedInput(
                     "Enter new phone number: ",
                     input => !string.IsNullOrWhiteSpace(input) && phoneRegex.IsMatch(input),
@@ -81,7 +63,7 @@ class Program
                     isRequired: true
                 );
                 break;
-            case 4:
+            case 2:
                 contact.Email = GetValidatedInput(
                     "Enter new email: ",
                     input => string.IsNullOrWhiteSpace(input) || emailRegex.IsMatch(input),
@@ -89,19 +71,19 @@ class Program
                     isRequired: false
                 );
                 break;
-            case 5:
+            case 3:
                 Console.Write("Enter new address: ");
                 contact.Address = Console.ReadLine();
                 break;
-            case 6:
+            case 4:
                 Console.Write("Enter new city: ");
                 contact.City = Console.ReadLine();
                 break;
-            case 7:
+            case 5:
                 Console.Write("Enter new state: ");
                 contact.State = Console.ReadLine();
                 break;
-            case 8:
+            case 6:
                 Console.Write("Enter new zip: ");
                 contact.Zip = Console.ReadLine();
                 break;
@@ -109,24 +91,44 @@ class Program
         Console.WriteLine("Contact Edited Successfully!");
     }
 
-    static Contact CollectContactInformation()
+    static Contact CollectContactInformation(Contacts contacts)
     {
         var phoneRegex = new Regex(@"^\+[1-9][0-9]{7,14}$");
         var emailRegex = new Regex(@"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-z]{2,}$");
-        
-        string firstName = GetValidatedInput(
-            "Enter first name: ",
-            input => !string.IsNullOrWhiteSpace(input),
-            "First name cannot be empty",
-            isRequired: true
-        );
-        
-        string lastName = GetValidatedInput(
-            "Enter last name: ",
-            input => !string.IsNullOrWhiteSpace(input),
-            "Last name cannot be empty",
-            isRequired: true
-        );
+
+        string name = "";
+        string firstName = "";
+        string lastName = "";
+
+        do
+        {
+            try
+            {
+                 firstName = GetValidatedInput(
+                    "Enter first name: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "First name cannot be empty",
+                    isRequired: true
+                );
+
+                 lastName = GetValidatedInput(
+                    "Enter last name: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "Last name cannot be empty",
+                    isRequired: true
+                );
+
+                name = firstName + lastName;
+                if (contacts.ContainsContact(name))
+                {
+                    throw new Exception("Duplicate contact name: " + name);
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        } while (contacts.ContainsContact(name));
         
         string phoneNumber = GetValidatedInput(
             "Enter phone number: ",
@@ -200,7 +202,7 @@ class Program
                 case '1':
                     Console.Clear();
                     PrintWelcomeScreen();
-                    contacts.AddContact(CollectContactInformation());
+                    contacts.AddContact(CollectContactInformation(contacts));
                     break;
                 case '2':
                     Console.Clear();

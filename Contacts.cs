@@ -45,6 +45,11 @@ internal class Contacts(int capacity)
         }
         return false;
     }
+
+    public bool ContainsContact(string name)
+    {
+        return  _contacts.Any(cont => cont.FirstName + cont.LastName == name);
+    }
     
     public bool IsEmpty()
     {
