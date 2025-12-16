@@ -1,35 +1,24 @@
+using System.Collections;
+
 namespace AddressBook;
 
 internal class Contacts(int capacity)
 {
-    private Contact[] _contacts  = new Contact[capacity];
-    private int _capacity = capacity;
-    public int NumOfContacts { get; private set; } = 0;
+    private readonly List<Contact> _contacts = new List<Contact>();
 
     public void AddContact(Contact contact)
     {
-        if (NumOfContacts == _capacity)
-        {
-            Contact[] newContacts = new Contact[_capacity * 2];
-            Array.Copy(_contacts, 0, newContacts, 0, NumOfContacts);
-            _contacts = newContacts;
-            _capacity *= 2;
-        }
-        
-        _contacts[NumOfContacts++] = contact;
+        _contacts.Add(contact);
     }
 
     public bool TryGetContact(string name, out Contact contact)
     {
         foreach (var cont in _contacts)
         {
-            if (cont != null)
+            if (cont.FirstName + cont.LastName == name) 
             {
-                if (cont.FirstName + cont.LastName == name) 
-                {
-                    contact = cont;
-                    return true;
-                }
+                contact = cont;
+                return true;
             }
         }
         contact = default!;
@@ -40,26 +29,17 @@ internal class Contacts(int capacity)
     {
         foreach (Contact contact in _contacts)
         {
-            if (contact != null!)
-            {
-                Console.WriteLine(contact.ToString());
-            }
+            Console.WriteLine(contact.ToString());
         }
     }
 
     public bool DeleteContact(string name)
     {
-        for(int i = 0; i < _capacity; i++)
+        foreach(var contact in  _contacts)
         {
-            if (_contacts[i] == null)
+            if (contact.FirstName + contact.LastName == name)
             {
-                continue;
-            }
-            
-            if (_contacts[i].FirstName + _contacts[i].LastName == name)
-            {
-                _contacts[i] = null;
-                NumOfContacts--;
+                _contacts.Remove(contact);
                 return true;
             }
         }
@@ -68,6 +48,6 @@ internal class Contacts(int capacity)
     
     public bool IsEmpty()
     {
-        return NumOfContacts <= 0;
+        return _contacts.Count == 0;
     }
 }
