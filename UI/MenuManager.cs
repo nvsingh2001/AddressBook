@@ -36,6 +36,7 @@ public static class MenuManager
         Console.WriteLine("[2] Display Contacts");
         Console.WriteLine("[3] Edit Contact");
         Console.WriteLine("[4] Delete Contacts");
+        Console.WriteLine("[5] Sort Contacts");
         Console.WriteLine("[q] Quit");
         Console.Write("\n\nEnter your choice: ");
     }

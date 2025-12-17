@@ -232,6 +232,20 @@ class Program
                     Console.WriteLine("\n\nPress any key to continue");
                     Console.ReadKey();
                     break;
+                case '5':
+                    MenuManager.PrintWelcomeScreen();
+                    if (contacts.IsEmpty())
+                    {
+                        Console.WriteLine("Address Book is Empty");
+                    }
+                    else
+                    {
+                        contacts.Sort();
+                        Console.WriteLine("Address Book is Sorted");
+                        Console.WriteLine("Press any key to continue . . . ");
+                        Console.ReadKey();
+                    }
+                    break;
                 case 'q':
                     break;
                 default:

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Immutable;
 using AddressBook.Models;
 using AddressBook.Exceptions;
 
@@ -61,5 +62,10 @@ public class ContactManager : IEnumerable<Contact>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+    
+    public void Sort()
+    {
+        _contacts.Sort();
     }
 }

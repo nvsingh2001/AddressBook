@@ -6,7 +6,7 @@ namespace AddressBook.Models;
 // email…
 
 public class Contact(string firstName, string lastName,string phone,string email = "", string address = "",
-    string city = "", string state = "", string zip = "")
+    string city = "", string state = "", string zip = "") : IComparable<Contact>
 {
     public string FirstName { get;} = firstName;
     public string LastName { get;} = lastName;
@@ -24,27 +24,33 @@ public class Contact(string firstName, string lastName,string phone,string email
 
     public override bool Equals(object? obj)
     {
-        if (obj is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-        
-        if(obj.GetType() != typeof(Contact))
-        {
-            return false;
-        }
-        
-        Contact other = (Contact)obj;
-        return FirstName == other.FirstName && LastName == other.LastName;
+        return obj is Contact other &&
+               FirstName.Equals(other.FirstName, StringComparison.InvariantCultureIgnoreCase) &&
+               LastName.Equals(other.LastName, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public override int GetHashCode()
     {
         return HashCode.Combine(FirstName, LastName);
+    }
+
+    public int CompareTo(Contact? other)
+    {
+        if (other is null) return 1;
+
+        int firstNameCompare = string.Compare(
+            FirstName,
+            other.FirstName,
+            StringComparison.InvariantCultureIgnoreCase
+        );
+
+        if (firstNameCompare != 0)
+            return firstNameCompare;
+
+        return string.Compare(
+            LastName,
+            other.LastName,
+            StringComparison.InvariantCultureIgnoreCase
+        );
     }
 }
