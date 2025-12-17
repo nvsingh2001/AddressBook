@@ -25,7 +25,8 @@ public static class MenuManager
         Console.WriteLine("[A] Create a Address Book");
         Console.WriteLine("[B] Open a Address Book");
         Console.WriteLine("[C] Search Contacts");
-        Console.WriteLine("[D] Exit");
+        Console.WriteLine("[D] Get Count of Contacts");
+        Console.WriteLine("[Q] Exit");
         Console.Write("\n\nEnter your choice: ");
     }
 
@@ -62,6 +63,16 @@ public static class MenuManager
         Console.WriteLine("[2] Search Contacts by State");
         Console.WriteLine("[3] Search Contacts by City and State");
         Console.WriteLine("[q] Quit");
+        Console.Write("\n\nEnter your choice: ");
+    }
+    
+    public static void GetCountOfContactsMenu()
+    {
+        PrintWelcomeScreen();
+        Console.WriteLine("[1] Get Count of Contacts by City");
+        Console.WriteLine("[2] Get Count of Contacts by State");
+        Console.WriteLine("[3] Get Count of Contacts by City and State");
+        Console.WriteLine("[4] Quit");
         Console.Write("\n\nEnter your choice: ");
     }
 }

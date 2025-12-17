@@ -71,4 +71,45 @@ public class AddressBookService
         CityDictionary[contact.City.ToLower()].Remove(contact);
         StateDictionary[contact.State.ToLower()].Remove(contact);
     }
+
+    public int GetCountOfContactByCityAndState(string? city, string? state)
+    {
+        int count = 0;
+        if (city != null && state != null)
+        {
+            var results = new List<Contact>();
+            StateDictionary.TryGetValue(state.ToLower(), out results);
+            if (results != null && results.Count > 0)
+            {
+                foreach (var result in results)
+                {
+                    if (result.City.Equals(city, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        count++;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (city != null)
+            {
+                if (CityDictionary.ContainsKey(city.ToLower()))
+                {
+                    count += CityDictionary[city.ToLower()].Count;
+                    
+                }
+            }
+
+            if (state != null)
+            {
+                if (StateDictionary.ContainsKey(state.ToLower()))
+                {
+                    count += StateDictionary[state.ToLower()].Count;
+                }
+            }
+        }
+
+        return count;
+    }
 }

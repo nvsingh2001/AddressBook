@@ -415,6 +415,51 @@ class Program
                     Console.ReadKey();
                     break;
                 case 'D':
+                    MenuManager.GetCountOfContactsMenu();
+                    switch (Console.ReadKey().KeyChar)
+                    {
+                        case '1':
+                            string cityName = InputValidator.GetValidatedInput(
+                                "Enter city name: ",
+                                input => !string.IsNullOrWhiteSpace(input),
+                                "City name cannot be empty",
+                                true
+                            );
+                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(cityName,null)}");
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                        case '2':
+                            string stateName = InputValidator.GetValidatedInput(
+                                "Enter State name: ",
+                                input => !string.IsNullOrWhiteSpace(input),
+                                "State name cannot be empty",
+                                true
+                            );
+                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(null,stateName)}");
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                        case '3':
+                            string state = InputValidator.GetValidatedInput(
+                                "Enter State name: ",
+                                input => !string.IsNullOrWhiteSpace(input),
+                                "State name cannot be empty",
+                                true
+                            );
+                            string city = InputValidator.GetValidatedInput(
+                                "Enter city name: ",
+                                input => !string.IsNullOrWhiteSpace(input),
+                                "City name cannot be empty",
+                                true
+                            );
+                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(city,state)}");
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                    }
+                    break;
+                case 'Q':
                     Environment.Exit(0);
                     break;
                 default:
