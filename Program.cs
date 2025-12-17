@@ -2,6 +2,7 @@ using AddressBook.Models;
 using AddressBook.Services;
 using AddressBook.UI;
 using AddressBook.Exceptions;
+using AddressBook.Comparers;
 
 namespace AddressBook;
 
@@ -233,17 +234,45 @@ class Program
                     Console.ReadKey();
                     break;
                 case '5':
-                    MenuManager.PrintWelcomeScreen();
+                    MenuManager.DisplaySortMenu();
                     if (contacts.IsEmpty())
                     {
                         Console.WriteLine("Address Book is Empty");
+                        Console.ReadKey();
                     }
                     else
                     {
-                        contacts.Sort();
-                        Console.WriteLine("Address Book is Sorted");
-                        Console.WriteLine("Press any key to continue . . . ");
-                        Console.ReadKey();
+                        char sortChoice = Console.ReadKey().KeyChar;
+                        switch (sortChoice)
+                        {
+                            case '1':
+                                contacts.Sort();
+                                Console.WriteLine("\nSorted by Name!");
+                                break;
+                            case '2':
+                                contacts.Sort(new CityComparer());
+                                Console.WriteLine("\nSorted by City!");
+                                break;
+                            case '3':
+                                contacts.Sort(new StateComparer());
+                                Console.WriteLine("\nSorted by State!");
+                                break;
+                            case '4':
+                                contacts.Sort(new ZipComparer());
+                                Console.WriteLine("\nSorted by Zip!");
+                                break;
+                            case '5':
+                                break; 
+                            default:
+                                Console.WriteLine("\nInvalid Option");
+                                break;
+                        }
+                        if (sortChoice != '5')
+                        {
+                            TablePrinter.PrintContacts(contacts);
+                            Console.WriteLine("Press any key to continue . . . ");
+                            Console.ReadKey();
+                        }
                     }
                     break;
                 case 'q':

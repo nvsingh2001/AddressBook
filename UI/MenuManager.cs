@@ -76,4 +76,16 @@ public static class MenuManager
         Console.WriteLine("[4] Quit");
         Console.Write("\n\nEnter your choice: ");
     }
+
+    public static void DisplaySortMenu()
+    {
+        Console.Clear();
+        PrintWelcomeScreen();
+        Console.WriteLine("[1] Sort by Name");
+        Console.WriteLine("[2] Sort by City");
+        Console.WriteLine("[3] Sort by State");
+        Console.WriteLine("[4] Sort by Zip");
+        Console.WriteLine("[5] Back");
+        Console.Write("\n\nEnter your choice: ");
+    }
 }

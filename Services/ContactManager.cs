@@ -68,4 +68,9 @@ public class ContactManager : IEnumerable<Contact>
     {
         _contacts.Sort();
     }
+
+    public void Sort(IComparer<Contact> comparer)
+    {
+        _contacts.Sort(comparer);
+    }
 }
