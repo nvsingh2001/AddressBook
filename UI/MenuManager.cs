@@ -6,13 +6,19 @@ public static class MenuManager
     {
         Console.Clear();
         string banner = @"
-  ___      _     _                    ______             _    
- / _ \    | |   | |                   | ___ \           | |   
-/ /_\ \ __| | __| |_ __ ___  ___ ___  | |_/ / ___   ___ | | __
-|  _  |/ _` |/ _` | '__/ _ \/ __/ __| | ___ \/ _ \ / _ \| |/ /
-| | | | (_| | (_| | | |  __\/\__ \__ \ | |_/ / (_) | (_) |   < 
-\_| |_/\__,_|\__,_|_|  \___||___/___/ \____/ \___/ \___/|_|\_\
-";
+
+
+  /$$$$$$        /$$       /$$                                              /$$$$$$$                      /$$      
+ /$$__  $$      | $$      | $$                                             | $$__  $$                    | $$      
+| $$  \ $$  /$$$$$$$  /$$$$$$$  /$$$$$$   /$$$$$$   /$$$$$$$ /$$$$$$$      | $$  \ $$  /$$$$$$   /$$$$$$ | $$   /$$
+| $$$$$$$$ /$$__  $$ /$$__  $$ /$$__  $$ /$$__  $$ /$$_____//$$_____/      | $$$$$$$  /$$__  $$ /$$__  $$| $$  /$$/
+| $$__  $$| $$  | $$| $$  | $$| $$  \__/| $$$$$$$$|  $$$$$$|  $$$$$$       | $$__  $$| $$  \ $$| $$  \ $$| $$$$$$/ 
+| $$  | $$| $$  | $$| $$  | $$| $$      | $$_____/ \____  $$\____  $$      | $$  \ $$| $$  | $$| $$  | $$| $$_  $$ 
+| $$  | $$|  $$$$$$$|  $$$$$$$| $$      |  $$$$$$$ /$$$$$$$//$$$$$$$/      | $$$$$$$/|  $$$$$$/|  $$$$$$/| $$ \  $$
+|__/  |__/ \_______/ \_______/|__/       \_______/|_______/|_______/       |_______/  \______/  \______/ |__/  \__/
+                                                                                                                   
+                                                                                                                   
+                                                                                                                   ";
         Console.WriteLine(banner);
     }
     
@@ -20,24 +26,29 @@ public static class MenuManager
     {
         Console.Clear();
         PrintWelcomeScreen();
-        Console.WriteLine("WELCOME TO YOUR ADDRESS BOOK");
+        Console.WriteLine("MAIN MENU");
         Console.WriteLine("------------------------------");
         Console.WriteLine("[A] Create a Address Book");
         Console.WriteLine("[B] Open a Address Book");
         Console.WriteLine("[C] Search Contacts");
         Console.WriteLine("[D] Get Count of Contacts");
+        Console.WriteLine("[E] List All Address Books");
         Console.WriteLine("[Q] Exit");
         Console.Write("\n\nEnter your choice: ");
     }
 
     public static void PrintAddressBookMenu()
     {
+        Console.Clear();
+        PrintWelcomeScreen();
+        Console.WriteLine("ADDRESS BOOK MENU");
+        Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Add Contact");
         Console.WriteLine("[2] Display Contacts");
         Console.WriteLine("[3] Edit Contact");
-        Console.WriteLine("[4] Delete Contacts");
+        Console.WriteLine("[4] Delete Contact");
         Console.WriteLine("[5] Sort Contacts");
-        Console.WriteLine("[q] Quit");
+        Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
 
@@ -46,13 +57,15 @@ public static class MenuManager
     {
         Console.Clear();
         PrintWelcomeScreen();
+        Console.WriteLine("EDIT CONTACT");
+        Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Edit Phone Number");
         Console.WriteLine("[2] Edit Email");
         Console.WriteLine("[3] Edit Address");
-        Console.WriteLine("[3] Edit City");
-        Console.WriteLine("[4] Edit State");
-        Console.WriteLine("[5] Edit Zip");
-        Console.WriteLine("[6] Exit");
+        Console.WriteLine("[4] Edit City");
+        Console.WriteLine("[5] Edit State");
+        Console.WriteLine("[6] Edit Zip");
+        Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
 
@@ -60,20 +73,25 @@ public static class MenuManager
     {
         Console.Clear();
         PrintWelcomeScreen();
+        Console.WriteLine("SEARCH CONTACTS");
+        Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Search Contacts by City");
         Console.WriteLine("[2] Search Contacts by State");
         Console.WriteLine("[3] Search Contacts by City and State");
-        Console.WriteLine("[q] Quit");
+        Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
     
     public static void GetCountOfContactsMenu()
     {
+        Console.Clear();
         PrintWelcomeScreen();
+        Console.WriteLine("COUNT CONTACTS");
+        Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Get Count of Contacts by City");
         Console.WriteLine("[2] Get Count of Contacts by State");
         Console.WriteLine("[3] Get Count of Contacts by City and State");
-        Console.WriteLine("[4] Quit");
+        Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
 
@@ -81,11 +99,13 @@ public static class MenuManager
     {
         Console.Clear();
         PrintWelcomeScreen();
+        Console.WriteLine("SORT CONTACTS");
+        Console.WriteLine("------------------------------");
         Console.WriteLine("[1] Sort by Name");
         Console.WriteLine("[2] Sort by City");
         Console.WriteLine("[3] Sort by State");
         Console.WriteLine("[4] Sort by Zip");
-        Console.WriteLine("[5] Back");
+        Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
 }

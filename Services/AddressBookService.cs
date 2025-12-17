@@ -1,9 +1,10 @@
 using AddressBook.Exceptions;
 using AddressBook.Models;
+using AddressBook.Services.Interfaces;
 
 namespace AddressBook.Services;
 
-public class AddressBookService
+public class AddressBookService : IAddressBookService
 {
     private readonly Dictionary<string, ContactManager> _addressBooks = new Dictionary<string, ContactManager>();
     public  Dictionary<string, List<Contact>> CityDictionary { get; } = new Dictionary<string, List<Contact>>();
@@ -49,6 +50,11 @@ public class AddressBookService
     public IEnumerable<ContactManager> GetAllAddressBooks()
     {
         return _addressBooks.Values;
+    }
+
+    public IEnumerable<string> GetAddressBookNames()
+    {
+        return _addressBooks.Keys;
     }
     
     public void AddContactByCityAndState(Contact contact){

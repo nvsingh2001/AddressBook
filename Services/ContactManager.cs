@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Immutable;
 using AddressBook.Models;
 using AddressBook.Exceptions;
+using AddressBook.Services.Interfaces;
 
 namespace AddressBook.Services;
 
-public class ContactManager : IEnumerable<Contact>
+public class ContactManager : IContactManager
 {
     private readonly List<Contact> _contacts = new List<Contact>();
 

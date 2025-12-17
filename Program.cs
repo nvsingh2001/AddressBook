@@ -3,12 +3,13 @@ using AddressBook.Services;
 using AddressBook.UI;
 using AddressBook.Exceptions;
 using AddressBook.Comparers;
+using AddressBook.Services.Interfaces;
 
 namespace AddressBook;
 
 class Program
 {
-    private static readonly AddressBookService AddressBookService = new AddressBookService();
+    private static readonly IAddressBookService AddressBookService = new AddressBookService();
 
     static void EditContactField(Contact contact, int choice)
     {
@@ -53,7 +54,7 @@ class Program
         Console.WriteLine("Contact Edited Successfully!");
     }
 
-    static Contact CollectContactInformation(ContactManager contacts)
+    static Contact CollectContactInformation(IContactManager contacts)
     {
         string name = "";
         string firstName = "";
@@ -121,14 +122,13 @@ class Program
         return new Contact(firstName, lastName, phoneNumber, email, address, city, state, zip);
     }
 
-    static void OpenAddressBook(ContactManager contacts)
+    static void OpenAddressBook(IContactManager contacts)
     {
         char choice; 
         do
         {
-            MenuManager.PrintWelcomeScreen();
             MenuManager.PrintAddressBookMenu();
-            choice = Console.ReadKey().KeyChar;
+            choice = char.ToUpper(Console.ReadKey().KeyChar);
             switch (choice)
             {
                 case '1':
@@ -242,7 +242,7 @@ class Program
                     }
                     else
                     {
-                        char sortChoice = Console.ReadKey().KeyChar;
+                        char sortChoice = char.ToUpper(Console.ReadKey().KeyChar);
                         switch (sortChoice)
                         {
                             case '1':
@@ -261,13 +261,13 @@ class Program
                                 contacts.Sort(new ZipComparer());
                                 Console.WriteLine("\nSorted by Zip!");
                                 break;
-                            case '5':
+                            case 'Q':
                                 break; 
                             default:
                                 Console.WriteLine("\nInvalid Option");
                                 break;
                         }
-                        if (sortChoice != '5')
+                        if (sortChoice != 'Q')
                         {
                             TablePrinter.PrintContacts(contacts);
                             Console.WriteLine("Press any key to continue . . . ");
@@ -275,7 +275,7 @@ class Program
                         }
                     }
                     break;
-                case 'q':
+                case 'Q':
                     break;
                 default:
                     Console.WriteLine("\nInvalid Input");
@@ -283,7 +283,7 @@ class Program
                     Console.ReadKey();
                     break;
             }
-        } while (choice != 'q');
+        } while (choice != 'Q');
     }
 
     static void SearchContactsByCityOrState(string? city, string? state)
@@ -382,7 +382,7 @@ class Program
         do
         {
             MenuManager.MainMenu();
-            switch (Console.ReadKey().KeyChar)
+            switch (char.ToUpper(Console.ReadKey().KeyChar))
             {
                 case 'A':
                     MenuManager.PrintWelcomeScreen();
@@ -418,7 +418,7 @@ class Program
                     break;
                 case 'C':
                     MenuManager.SearchContactsMenu();
-                    switch (Console.ReadKey().KeyChar)
+                    switch (char.ToUpper(Console.ReadKey().KeyChar))
                     {
                         case '1':
                             SearchContactsByCityOrState(
@@ -452,14 +452,22 @@ class Program
                             );
                             SearchContactsByCityOrState(cityName, stateName);
                             break;
-                        
+                        case 'Q':
+                            break;
+                        default:
+                            Console.WriteLine("\nInvalid Option");
+                            Console.ReadKey();
+                            break;
                     }
-                    Console.WriteLine("\n\nPress any key to continue");
-                    Console.ReadKey();
+                    if(char.ToUpper(Console.ReadKey().KeyChar) != 'Q')
+                    {
+                        Console.WriteLine("\n\nPress any key to continue");
+                        Console.ReadKey();
+                    }
                     break;
                 case 'D':
                     MenuManager.GetCountOfContactsMenu();
-                    switch (Console.ReadKey().KeyChar)
+                    switch (char.ToUpper(Console.ReadKey().KeyChar))
                     {
                         case '1':
                             string cityName = InputValidator.GetValidatedInput(
@@ -500,6 +508,25 @@ class Program
                             Console.WriteLine("Press any key to continue");
                             Console.ReadKey();
                             break;
+                         case 'Q':
+                            break;
+                         default:
+                            Console.WriteLine("\nInvalid Option");
+                            Console.ReadKey();
+                            break;
+                    }
+                    break;
+                case 'E':
+                    if (AddressBookService.IsEmpty())
+                    {
+                        Console.WriteLine("No Address Books created!");
+                        Console.ReadKey();
+                    }
+                    else
+                    {
+                        TablePrinter.PrintAddressBooks(AddressBookService.GetAddressBookNames());
+                        Console.WriteLine("\n\nPress any key to continue");
+                        Console.ReadKey();
                     }
                     break;
                 case 'Q':
