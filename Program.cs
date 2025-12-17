@@ -135,7 +135,9 @@ class Program
                     MenuManager.PrintWelcomeScreen();
                     try
                     {
-                        contacts.AddContact(CollectContactInformation(contacts));
+                        Contact newContact = CollectContactInformation(contacts);
+                        contacts.AddContact(newContact);
+                        AddressBookService.AddContactByCityAndState(newContact);
                     }
                     catch (DuplicateContactException ex)
                     {
@@ -198,7 +200,7 @@ class Program
                     MenuManager.PrintWelcomeScreen();
                     if (contacts.IsEmpty())
                     {
-                        Console.WriteLine("No Contact to edit");
+                        Console.WriteLine("No Contact to Delete");
                     }
                     else
                     {
@@ -218,7 +220,8 @@ class Program
 
                         try 
                         {
-                            contacts.DeleteContact(firstName + lastName);
+                            Contact deletedContact = contacts.DeleteContact(firstName + lastName);
+                            AddressBookService.RemoveContactByCityAndState(deletedContact);
                             Console.WriteLine("Contact Deleted!");
                         }
                         catch (ContactNotFoundException ex)
@@ -243,26 +246,41 @@ class Program
     static void SearchContactsByCityOrState(string? city, string? state)
     {
         var searchResults = new List<Contact>();
-        foreach (var contacts in AddressBookService.GetAllAddressBooks())
+        if (city != null && state != null)
         {
-            foreach (Contact contact in contacts)
+            var results = new  List<Contact>();
+            AddressBookService.StateDictionary.TryGetValue(state.ToLower(), out results);
+            if (results != null && results.Count > 0)
             {
-                bool match = true; 
-                
-                if (!string.IsNullOrEmpty(city) && !contact.City.Equals(city, StringComparison.OrdinalIgnoreCase))
+                foreach (var result in results)
                 {
-                    match = false;
+                    if (result.City.Equals(city, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        searchResults.Add(result);
+                    }
                 }
-                
-                if (!string.IsNullOrEmpty(state) && !contact.State.Equals(state, StringComparison.OrdinalIgnoreCase))
+            }
+        }
+        else
+        {
+            if (city != null)
+            {
+                var cityResults = new List<Contact>();
+                AddressBookService.CityDictionary.TryGetValue(city.ToLower(), out cityResults);
+                if (cityResults != null && cityResults.Count > 0)
                 {
-                    match = false;
+                    searchResults.AddRange(cityResults);
                 }
-                
-                if (match)
+            }
+
+            if (state != null)
+            {
+                var stateResults = new List<Contact>();
+                AddressBookService.StateDictionary.TryGetValue(state.ToLower(), out stateResults);
+                if (stateResults != null && stateResults.Count > 0)
                 {
-                    searchResults.Add(contact);
-                } 
+                    searchResults.AddRange(stateResults);
+                }
             }
         }
         TablePrinter.PrintContacts(searchResults);
@@ -295,12 +313,25 @@ class Program
     static void Main()
     {
         ContactManager contacts1 = new ContactManager();
-        contacts1.AddContact(new Contact("Naman","Singh","+917908254373","nvsingh2001@hotmail.com","Matelli Bazar","Jalpaiguri", "West Bengal","735223"));
-        contacts1.AddContact(new Contact("Ankit", "Kumar", "+91790825425","ankitkumar25@gmail.com","Bihar", "Bihar", "Bihar", "800001"));
+        Contact contact1 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
+            "Jalpaiguri", "West Bengal", "735223");
+        contacts1.AddContact(contact1);
+        AddressBookService.AddContactByCityAndState(contact1);
+        
+        Contact contact2 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
+            "Bihar", "800001");
+        contacts1.AddContact(contact2);
+        AddressBookService.AddContactByCityAndState(contact2);
         
         ContactManager contacts2 = new ContactManager();
-        contacts2.AddContact(new Contact("Naman","Singh","+917908254373","nvsingh2001@hotmail.com","Matelli Bazar","Jalpaiguri", "West Bengal","735223"));
-        contacts2.AddContact(new Contact("Ankit", "Kumar", "+91790825425","ankitkumar25@gmail.com","Bihar", "Bihar", "Bihar", "800001"));
+        Contact contact3 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
+            "Jalpaiguri", "West Bengal", "735223");
+        contacts2.AddContact(contact3);
+        AddressBookService.AddContactByCityAndState(contact3);
+        Contact contact4 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
+            "Bihar", "800001");
+        contacts2.AddContact(contact4);
+        AddressBookService.AddContactByCityAndState(contact4);
         
         AddressBookService.AddAddressBook("addressbook1", contacts1);
         AddressBookService.AddAddressBook("addressbook2", contacts2);

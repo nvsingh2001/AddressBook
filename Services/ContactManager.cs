@@ -31,7 +31,7 @@ public class ContactManager : IEnumerable<Contact>
         return false;
     }
 
-    public void DeleteContact(string name)
+    public Contact DeleteContact(string name)
     {
         var contact = _contacts.FirstOrDefault(c => string.Equals(c.FirstName + c.LastName, name, StringComparison.InvariantCultureIgnoreCase));
         if (contact == null)
@@ -39,6 +39,8 @@ public class ContactManager : IEnumerable<Contact>
             throw new ContactNotFoundException(name);
         }
         _contacts.Remove(contact);
+        
+        return contact;
     }
 
     public bool ContainsContact(string name)

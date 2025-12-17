@@ -58,9 +58,10 @@ public static class MenuManager
     {
         Console.Clear();
         PrintWelcomeScreen();
-        Console.WriteLine("[1] Search Contacts by State");
-        Console.WriteLine("[2] Search Contacts by City");
+        Console.WriteLine("[1] Search Contacts by City");
+        Console.WriteLine("[2] Search Contacts by State");
         Console.WriteLine("[3] Search Contacts by City and State");
         Console.WriteLine("[q] Quit");
+        Console.Write("\n\nEnter your choice: ");
     }
 }

@@ -25,6 +25,8 @@ public static class TablePrinter
         int totalWidth = firstNameWidth + lastNameWidth + phoneWidth + emailWidth + 
                          addressWidth + cityWidth + stateWidth + zipWidth + 17;
 
+        Console.Clear();
+        MenuManager.PrintWelcomeScreen();
         Console.WriteLine("╔" + new string('═', totalWidth) + "╗");
 
         Console.WriteLine("║ " +
@@ -49,7 +51,7 @@ public static class TablePrinter
                 PadRight(Truncate(contact.Address, addressWidth), addressWidth) + "│ " +
                 PadRight(Truncate(contact.City, cityWidth), cityWidth) + "│ " +
                 PadRight(Truncate(contact.State, stateWidth), stateWidth) + "│ " +
-                PadRight(Truncate(contact.Zip, zipWidth), zipWidth) + " ║");
+                PadRight(Truncate(contact.Zip, zipWidth), zipWidth) + "  ║");
         }
 
         Console.WriteLine("╚" + new string('═', totalWidth) + "╝");
