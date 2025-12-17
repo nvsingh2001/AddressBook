@@ -39,16 +39,33 @@ class Program
                 contact.Address = Console.ReadLine() ?? "";
                 break;
             case 4:
-                Console.Write("Enter new city: ");
-                contact.City = Console.ReadLine() ?? "";
+                AddressBookService.RemoveContactByCityAndState(contact);
+                contact.City = InputValidator.GetValidatedInput(
+                    "Enter new city: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "City cannot be empty",
+                    isRequired: true
+                );
+                AddressBookService.AddContactByCityAndState(contact);
                 break;
             case 5:
-                Console.Write("Enter new state: ");
-                contact.State = Console.ReadLine() ?? "";
+                AddressBookService.RemoveContactByCityAndState(contact);
+                contact.State = InputValidator.GetValidatedInput(
+                    "Enter new state: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "State cannot be empty",
+                    isRequired: true
+                );
+                AddressBookService.AddContactByCityAndState(contact);
                 break;
             case 6:
-                Console.Write("Enter new zip: ");
-                contact.Zip = Console.ReadLine() ?? "";
+                contact.Zip = InputValidator.GetValidatedInput(
+                    "Enter new zip: ",
+                    new[] {
+                        ((Func<string, bool>)(input => InputValidator.ZipRegex.IsMatch(input)), "Zip is invalid")
+                    },
+                    isRequired: false
+                );
                 break;
         }
         Console.WriteLine("Contact Edited Successfully!");
@@ -110,14 +127,27 @@ class Program
         Console.Write("Enter address: ");
         string address = Console.ReadLine() ?? "";
         
-        Console.Write("Enter city: ");
-        string city = Console.ReadLine() ?? "";
+        string city = InputValidator.GetValidatedInput(
+            "Enter city: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "City cannot be empty",
+            isRequired: true
+        );
         
-        Console.Write("Enter state: ");
-        string state = Console.ReadLine() ?? "";
+        string state = InputValidator.GetValidatedInput(
+            "Enter state: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "State cannot be empty",
+            isRequired: true
+        );
         
-        Console.Write("Enter zip: ");
-        string zip = Console.ReadLine() ?? "";
+        string zip = InputValidator.GetValidatedInput(
+            "Enter zip: ",
+             new[] {
+                ((Func<string, bool>)(input => InputValidator.ZipRegex.IsMatch(input)), "Zip is invalid")
+            },
+            isRequired: false
+        );
         
         return new Contact(firstName, lastName, phoneNumber, email, address, city, state, zip);
     }

@@ -6,6 +6,7 @@ public static class InputValidator
 {
     public static readonly Regex PhoneRegex = new Regex(@"^\+[1-9][0-9]{7,14}$");
     public static readonly Regex EmailRegex = new Regex(@"[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-z]{2,}$");
+    public static readonly Regex ZipRegex = new Regex(@"^[1-9][0-9]{5}$");
 
     public static string GetValidatedInput(string prompt, Func<string, bool> validator, string errorMessage, bool isRequired)
     {

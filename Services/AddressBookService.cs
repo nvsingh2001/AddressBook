@@ -74,8 +74,15 @@ public class AddressBookService : IAddressBookService
 
     public void RemoveContactByCityAndState(Contact contact)
     {
-        CityDictionary[contact.City.ToLower()].Remove(contact);
-        StateDictionary[contact.State.ToLower()].Remove(contact);
+        if (CityDictionary.ContainsKey(contact.City.ToLower()))
+        {
+            CityDictionary[contact.City.ToLower()].Remove(contact);
+        }
+
+        if (StateDictionary.ContainsKey(contact.State.ToLower()))
+        {
+            StateDictionary[contact.State.ToLower()].Remove(contact);
+        }
     }
 
     public int GetCountOfContactByCityAndState(string? city, string? state)
