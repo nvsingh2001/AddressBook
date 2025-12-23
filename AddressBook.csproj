@@ -8,7 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Utilities\" />
+        <Folder Include="Utilities\"/>
+        <Compile Remove="AddressBook.Tests\**" />
+        <EmbeddedResource Remove="AddressBook.Tests\**" />
+        <None Remove="AddressBook.Tests\**" />
     </ItemGroup>
 
 </Project>

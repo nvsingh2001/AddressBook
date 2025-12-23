@@ -1,55 +1,50 @@
 using System.Collections;
-using System.Collections.Immutable;
-using AddressBook.Models;
 using AddressBook.Exceptions;
+using AddressBook.Models;
 using AddressBook.Services.Interfaces;
 
 namespace AddressBook.Services;
 
 public class ContactManager : IContactManager
 {
-    private readonly List<Contact> _contacts = new List<Contact>();
+    private readonly List<Contact> _contacts = new();
 
     public void AddContact(Contact contact)
     {
         if (ContainsContact(contact.FirstName + contact.LastName))
-        {
             throw new DuplicateContactException(contact.FirstName + contact.LastName);
-        }
         _contacts.Add(contact);
     }
 
     public bool TryGetContact(string name, out Contact contact)
     {
         foreach (var cont in _contacts)
-        {
-            if (string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase)) 
+            if (string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase))
             {
                 contact = cont;
                 return true;
             }
-        }
+
         contact = default!;
         return false;
     }
 
     public Contact DeleteContact(string name)
     {
-        var contact = _contacts.FirstOrDefault(c => string.Equals(c.FirstName + c.LastName, name, StringComparison.InvariantCultureIgnoreCase));
-        if (contact == null)
-        {
-            throw new ContactNotFoundException(name);
-        }
+        var contact = _contacts.FirstOrDefault(c =>
+            string.Equals(c.FirstName + c.LastName, name, StringComparison.InvariantCultureIgnoreCase));
+        if (contact == null) throw new ContactNotFoundException(name);
         _contacts.Remove(contact);
-        
+
         return contact;
     }
 
     public bool ContainsContact(string name)
     {
-        return  _contacts.Any(cont => string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase));
+        return _contacts.Any(cont =>
+            string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase));
     }
-    
+
     public bool IsEmpty()
     {
         return _contacts.Count == 0;
@@ -64,7 +59,7 @@ public class ContactManager : IContactManager
     {
         return GetEnumerator();
     }
-    
+
     public void Sort()
     {
         _contacts.Sort();

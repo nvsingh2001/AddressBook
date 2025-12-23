@@ -5,7 +5,7 @@ public static class MenuManager
     public static void PrintWelcomeScreen()
     {
         Console.Clear();
-        string banner = @"
+        var banner = @"
 
 
   /$$$$$$        /$$       /$$                                              /$$$$$$$                      /$$      
@@ -21,7 +21,7 @@ public static class MenuManager
                                                                                                                    ";
         Console.WriteLine(banner);
     }
-    
+
     public static void MainMenu()
     {
         Console.Clear();
@@ -81,7 +81,7 @@ public static class MenuManager
         Console.WriteLine("[Q] Back");
         Console.Write("\n\nEnter your choice: ");
     }
-    
+
     public static void GetCountOfContactsMenu()
     {
         Console.Clear();
