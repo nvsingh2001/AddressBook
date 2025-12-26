@@ -1,51 +1,55 @@
 using AddressBook.Exceptions;
 using AddressBook.Models;
 using AddressBook.Services.Interfaces;
+using AddressBook.Utilities.FileHandling;
 
 namespace AddressBook.Services;
 
 public class AddressBookService : IAddressBookService
 {
-    private readonly Dictionary<string, ContactManager> _addressBooks = new();
+    private readonly AddressBookIO _addressBookIo = new();
+    private const string DataFilePath = "Data/addressbook.txt";
+
+    public Dictionary<string, ContactManager> AddressBooks { get; } = new();
     public Dictionary<string, List<Contact>> CityDictionary { get; } = new();
     public Dictionary<string, List<Contact>> StateDictionary { get; } = new();
 
     public void CreateAddressBook(string name)
     {
-        if (_addressBooks.ContainsKey(name)) throw new DuplicateAddressBookException(name);
-        _addressBooks.Add(name, new ContactManager());
+        if (AddressBooks.ContainsKey(name)) throw new DuplicateAddressBookException(name);
+        AddressBooks.Add(name, new ContactManager());
     }
 
     public void AddAddressBook(string name, ContactManager contactManager)
     {
-        if (_addressBooks.ContainsKey(name)) throw new DuplicateAddressBookException(name);
-        _addressBooks.Add(name, contactManager);
+        if (AddressBooks.ContainsKey(name)) throw new DuplicateAddressBookException(name);
+        AddressBooks.Add(name, contactManager);
     }
 
     public ContactManager GetAddressBook(string name)
     {
-        if (!_addressBooks.ContainsKey(name)) throw new AddressBookNotFoundException(name);
-        return _addressBooks[name];
+        if (!AddressBooks.ContainsKey(name)) throw new AddressBookNotFoundException(name);
+        return AddressBooks[name];
     }
 
     public bool ContainsAddressBook(string name)
     {
-        return _addressBooks.ContainsKey(name);
+        return AddressBooks.ContainsKey(name);
     }
 
     public bool IsEmpty()
     {
-        return _addressBooks.Count == 0;
+        return AddressBooks.Count == 0;
     }
 
     public IEnumerable<ContactManager> GetAllAddressBooks()
     {
-        return _addressBooks.Values;
+        return AddressBooks.Values;
     }
 
     public IEnumerable<string> GetAddressBookNames()
     {
-        return _addressBooks.Keys;
+        return AddressBooks.Keys;
     }
 
     public void AddContactByCityAndState(Contact contact)
@@ -92,5 +96,23 @@ public class AddressBookService : IAddressBookService
         }
 
         return count;
+    }
+
+    public void SaveData()
+    {
+        var directory = Path.GetDirectoryName(DataFilePath);
+        if (directory != null && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+        _addressBookIo.WriteToTextFile(this, DataFilePath);
+    }
+
+    public void LoadData()
+    {
+        if (File.Exists(DataFilePath))
+        {
+            _addressBookIo.ReadFromTextFile(this, DataFilePath);
+        }
     }
 }

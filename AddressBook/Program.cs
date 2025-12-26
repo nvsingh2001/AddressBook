@@ -376,29 +376,7 @@ internal class Program
 
     private static void Main()
     {
-        var contacts1 = new ContactManager();
-        var contact1 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
-            "Jalpaiguri", "West Bengal", "735223");
-        contacts1.AddContact(contact1);
-        AddressBookService.AddContactByCityAndState(contact1);
-
-        var contact2 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
-            "Bihar", "800001");
-        contacts1.AddContact(contact2);
-        AddressBookService.AddContactByCityAndState(contact2);
-
-        var contacts2 = new ContactManager();
-        var contact3 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
-            "Jalpaiguri", "West Bengal", "735223");
-        contacts2.AddContact(contact3);
-        AddressBookService.AddContactByCityAndState(contact3);
-        var contact4 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
-            "Bihar", "800001");
-        contacts2.AddContact(contact4);
-        AddressBookService.AddContactByCityAndState(contact4);
-
-        AddressBookService.AddAddressBook("addressbook1", contacts1);
-        AddressBookService.AddAddressBook("addressbook2", contacts2);
+        AddressBookService.LoadData();
 
         do
         {
@@ -553,6 +531,7 @@ internal class Program
 
                     break;
                 case 'Q':
+                    AddressBookService.SaveData();
                     Environment.Exit(0);
                     break;
                 default:
