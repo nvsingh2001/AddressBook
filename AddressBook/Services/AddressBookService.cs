@@ -1,14 +1,14 @@
 using AddressBook.Exceptions;
 using AddressBook.Models;
 using AddressBook.Services.Interfaces;
-using AddressBook.Utilities.FileHandling;
+using AddressBook.Utilities.FileHandling.Csv;
 
 namespace AddressBook.Services;
 
 public class AddressBookService : IAddressBookService
 {
-    private readonly AddressBookIO _addressBookIo = new();
-    private const string DataFilePath = "Data/addressbook.txt";
+    private readonly IAddressBookIo _addressBookIo = new AddressBookCsvIO();
+    private const string DataFilePath = "Data/addressbook.csv";
 
     public Dictionary<string, ContactManager> AddressBooks { get; } = new();
     public Dictionary<string, List<Contact>> CityDictionary { get; } = new();
