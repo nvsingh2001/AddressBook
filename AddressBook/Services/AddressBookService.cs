@@ -1,6 +1,7 @@
 using AddressBook.Exceptions;
 using AddressBook.Models;
 using AddressBook.Services.Interfaces;
+using AddressBook.Utilities.FileHandling;
 using AddressBook.Utilities.FileHandling.Csv;
 using AddressBook.Utilities.FileHandling.Json;
 
@@ -9,8 +10,13 @@ namespace AddressBook.Services;
 public class AddressBookService : IAddressBookService
 {
     // private readonly IAddressBookIo _addressBookIo = new AddressBookCsvIO();
-    private readonly IAddressBookIo _addressBookIo = new AddressBookJsonIo();
-    private const string DataFilePath = "Data/addressbook.csv";
+    private readonly IAddressBookIo _addressBookIoJson = new AddressBookJsonIo();
+    private readonly IAddressBookIo _addressBookIoCsv = new AddressBookCsvIO();
+    private readonly IAddressBookIo _addressBookIo = new AddressBookIO();
+
+    private const string DataFilePathText = "Data/addressbook.txt";
+    private const string DataFilePathJson = "Data/addressbook.json";
+    private const string DataFilePathCsv = "Data/addressbook.csv";
 
     public Dictionary<string, ContactManager> AddressBooks { get; } = new();
     public Dictionary<string, List<Contact>> CityDictionary { get; } = new();
@@ -100,21 +106,23 @@ public class AddressBookService : IAddressBookService
         return count;
     }
 
-    public void SaveData()
+    public async Task SaveDataAsync()
     {
-        var directory = Path.GetDirectoryName(DataFilePath);
+        var directory = Path.GetDirectoryName(DataFilePathText);
         if (directory != null && !Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
-        _addressBookIo.WriteToTextFile(this, DataFilePath);
+        await _addressBookIo.WriteToTextFile(this, DataFilePathText);
+        await _addressBookIoCsv.WriteToTextFile(this, DataFilePathCsv);
+        await _addressBookIoJson.WriteToTextFile(this, DataFilePathJson);
     }
 
-    public void LoadData()
+    public async Task LoadDataAsync()
     {
-        if (File.Exists(DataFilePath))
+        if (File.Exists(DataFilePathText))
         {
-            _addressBookIo.ReadFromTextFile(this, DataFilePath);
+            await _addressBookIoJson.ReadFromTextFile(this, DataFilePathJson);
         }
     }
 }

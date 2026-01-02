@@ -15,7 +15,7 @@ public class AddressBookIO : IAddressBookIo
             book => book.Value.ToList());
     }
 
-    public void WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
     {
         using var writer = new StreamWriter(path);
         var data = ExtractData(addressBookService);
@@ -27,12 +27,12 @@ public class AddressBookIO : IAddressBookIo
                 var line = string.Join(ContactFieldDelimiter,
                     contact.FirstName, contact.LastName, contact.Phone, contact.Email,
                     contact.Address, contact.City, contact.State, contact.Zip);
-                writer.WriteLine(line);
+               await writer.WriteLineAsync(line);
             }
         }
     }
 
-    public void ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
     {
         if (!File.Exists(path)) return;
 
@@ -40,7 +40,7 @@ public class AddressBookIO : IAddressBookIo
         string? line;
         ContactManager? currentManager = null;
 
-        while ((line = reader.ReadLine()) != null)
+        while ((line = await reader.ReadLineAsync()) != null)
         {
             if (line.StartsWith(AddressBookDelimiter))
             {

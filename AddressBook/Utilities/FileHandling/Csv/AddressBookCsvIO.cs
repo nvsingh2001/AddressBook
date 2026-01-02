@@ -27,7 +27,7 @@ public class AddressBookCsvIO : IAddressBookIo
             book => book.Value.ToList());
     }
 
-    public void WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
     {
         var data = addressBookService.AddressBooks.ToDictionary(book => book.Key, book => book.Value.ToList());
         
@@ -47,10 +47,10 @@ public class AddressBookCsvIO : IAddressBookIo
 
         using var writer = new StreamWriter(path);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-        csv.WriteRecords(records);
+        await csv.WriteRecordsAsync(records);
     }
 
-    public void ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
     {
         if (!File.Exists(path)) return;
 
@@ -59,7 +59,7 @@ public class AddressBookCsvIO : IAddressBookIo
             using var reader = new StreamReader(path);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             
-            var records = csv.GetRecords<ContactCsvModel>().ToList();
+            var records = await csv.GetRecordsAsync<ContactCsvModel>().ToListAsync();
             
             foreach (var group in records.GroupBy(r => r.AddressBookName))
             {

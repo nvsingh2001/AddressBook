@@ -4,6 +4,6 @@ using AddressBook.Models;
 public interface IAddressBookIo
 {
     Dictionary<string, List<Contact>> ExtractData(AddressBookService addressBookService);
-    void WriteToTextFile(AddressBookService addressBookService, string path);
-    void ReadFromTextFile(AddressBookService addressBookService, string path);
+    Task WriteToTextFile(AddressBookService addressBookService, string path);
+    Task ReadFromTextFile(AddressBookService addressBookService, string path);
 }

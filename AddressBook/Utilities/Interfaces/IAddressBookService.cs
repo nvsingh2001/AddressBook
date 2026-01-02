@@ -17,6 +17,6 @@ public interface IAddressBookService
     void AddContactByCityAndState(Contact contact);
     void RemoveContactByCityAndState(Contact contact);
     int GetCountOfContactByCityAndState(string? city, string? state);
-    void SaveData();
-    void LoadData();
+    Task SaveDataAsync();
+    Task LoadDataAsync();
 }

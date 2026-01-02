@@ -26,7 +26,7 @@ public class AddressBookJsonIo: IAddressBookIo
     }
     
     
-    public void WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
     {
         var data = addressBookService.AddressBooks
             .ToDictionary(
@@ -50,18 +50,19 @@ public class AddressBookJsonIo: IAddressBookIo
         {
             WriteIndented = true
         };
-
-        File.WriteAllText(path, JsonSerializer.Serialize(data, options));
+        
+        await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+        await JsonSerializer.SerializeAsync(fs, data, options);
     }
     
     
-    public void ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
     {
         if (!File.Exists(path)) return;
 
-        var json = File.ReadAllText(path);
+        var json = File.OpenRead(path);
 
-        var data = JsonSerializer.Deserialize<
+        var data = await JsonSerializer.DeserializeAsync<
             Dictionary<string, List<ContactJsonModel>>
         >(json);
 

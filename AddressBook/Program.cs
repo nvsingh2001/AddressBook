@@ -374,9 +374,9 @@ internal class Program
             }
     }
 
-    private static void Main()
+    private static async Task Main()
     {
-        AddressBookService.LoadData();
+        await AddressBookService.LoadDataAsync();
 
         do
         {
@@ -531,15 +531,14 @@ internal class Program
 
                     break;
                 case 'Q':
-                    AddressBookService.SaveData();
+                    await AddressBookService.SaveDataAsync();
                     Environment.Exit(0);
                     break;
                 default:
                     Console.WriteLine("\nInvalid Input");
                     Console.WriteLine("Press any key to continue . . . ");
                     Console.ReadKey();
-                    break;
-            }
+                    break; }
         } while (true);
     }
 }
