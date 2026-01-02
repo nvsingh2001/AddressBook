@@ -1,77 +1,72 @@
 using System.Collections;
-using System.Collections.Immutable;
-using AddressBook.Models;
 using AddressBook.Exceptions;
+using AddressBook.Models;
 using AddressBook.Services.Interfaces;
 
 namespace AddressBook.Services;
 
 public class ContactManager : IContactManager
 {
-    private readonly List<Contact> _contacts = new List<Contact>();
+    public List<Contact> Contacts { get; } = new();
 
     public void AddContact(Contact contact)
     {
         if (ContainsContact(contact.FirstName + contact.LastName))
-        {
             throw new DuplicateContactException(contact.FirstName + contact.LastName);
-        }
-        _contacts.Add(contact);
+        Contacts.Add(contact);
     }
 
     public bool TryGetContact(string name, out Contact contact)
     {
-        foreach (var cont in _contacts)
-        {
-            if (string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase)) 
+        foreach (var cont in Contacts)
+            if (string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase))
             {
                 contact = cont;
                 return true;
             }
-        }
+
         contact = default!;
         return false;
     }
 
     public Contact DeleteContact(string name)
     {
-        var contact = _contacts.FirstOrDefault(c => string.Equals(c.FirstName + c.LastName, name, StringComparison.InvariantCultureIgnoreCase));
-        if (contact == null)
-        {
-            throw new ContactNotFoundException(name);
-        }
-        _contacts.Remove(contact);
-        
+        var contact = Contacts.FirstOrDefault(c =>
+            string.Equals(c.FirstName + c.LastName, name, StringComparison.InvariantCultureIgnoreCase));
+        if (contact == null) throw new ContactNotFoundException(name);
+        Contacts.Remove(contact);
+
         return contact;
     }
 
     public bool ContainsContact(string name)
     {
-        return  _contacts.Any(cont => string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase));
+        return Contacts.Any(cont =>
+            string.Equals(cont.FirstName + cont.LastName, name, StringComparison.InvariantCultureIgnoreCase));
     }
-    
+
     public bool IsEmpty()
     {
-        return _contacts.Count == 0;
+        return Contacts.Count == 0;
     }
 
     public IEnumerator<Contact> GetEnumerator()
     {
-        return _contacts.GetEnumerator();
+        return Contacts.GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
-    
+
     public void Sort()
     {
-        _contacts.Sort();
+        Contacts.Sort();
     }
 
     public void Sort(IComparer<Contact> comparer)
     {
-        _contacts.Sort(comparer);
+        Contacts.Sort(comparer);
     }
 }

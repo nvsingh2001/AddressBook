@@ -1,37 +1,39 @@
+using AddressBook.Comparers;
+using AddressBook.Exceptions;
 using AddressBook.Models;
 using AddressBook.Services;
-using AddressBook.UI;
-using AddressBook.Exceptions;
-using AddressBook.Comparers;
 using AddressBook.Services.Interfaces;
+using AddressBook.UI;
 
 namespace AddressBook;
 
-class Program
+internal class Program
 {
     private static readonly IAddressBookService AddressBookService = new AddressBookService();
 
-    static void EditContactField(Contact contact, int choice)
+    private static void EditContactField(Contact contact, int choice)
     {
         switch (choice)
         {
             case 1:
                 contact.Phone = InputValidator.GetValidatedInput(
                     "Enter new phone number: ",
-                    new[] {
-                        ((Func<string, bool>)(input => !string.IsNullOrWhiteSpace(input)), "Phone number cannot be empty"),
-                        ((Func<string, bool>)(input => InputValidator.PhoneRegex.IsMatch(input)), "Phone number is invalid")
-                    },
-                    isRequired: true
+                    new[]
+                    {
+                        (input => !string.IsNullOrWhiteSpace(input), "Phone number cannot be empty"),
+                        ((Func<string, bool>)(input => InputValidator.PhoneRegex.IsMatch(input)),
+                            "Phone number is invalid")
+                    }
                 );
                 break;
             case 2:
                 contact.Email = InputValidator.GetValidatedInput(
                     "Enter new email: ",
-                    new[] {
+                    new[]
+                    {
                         ((Func<string, bool>)(input => InputValidator.EmailRegex.IsMatch(input)), "Email is invalid")
                     },
-                    isRequired: false
+                    false
                 );
                 break;
             case 3:
@@ -39,90 +41,121 @@ class Program
                 contact.Address = Console.ReadLine() ?? "";
                 break;
             case 4:
-                Console.Write("Enter new city: ");
-                contact.City = Console.ReadLine() ?? "";
+                AddressBookService.RemoveContactByCityAndState(contact);
+                contact.City = InputValidator.GetValidatedInput(
+                    "Enter new city: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "City cannot be empty",
+                    true
+                );
+                AddressBookService.AddContactByCityAndState(contact);
                 break;
             case 5:
-                Console.Write("Enter new state: ");
-                contact.State = Console.ReadLine() ?? "";
+                AddressBookService.RemoveContactByCityAndState(contact);
+                contact.State = InputValidator.GetValidatedInput(
+                    "Enter new state: ",
+                    input => !string.IsNullOrWhiteSpace(input),
+                    "State cannot be empty",
+                    true
+                );
+                AddressBookService.AddContactByCityAndState(contact);
                 break;
             case 6:
-                Console.Write("Enter new zip: ");
-                contact.Zip = Console.ReadLine() ?? "";
+                contact.Zip = InputValidator.GetValidatedInput(
+                    "Enter new zip: ",
+                    new[]
+                    {
+                        ((Func<string, bool>)(input => InputValidator.ZipRegex.IsMatch(input)), "Zip is invalid")
+                    },
+                    false
+                );
                 break;
         }
+
         Console.WriteLine("Contact Edited Successfully!");
     }
 
-    static Contact CollectContactInformation(IContactManager contacts)
+    private static Contact CollectContactInformation(IContactManager contacts)
     {
-        string name = "";
-        string firstName = "";
-        string lastName = "";
+        var name = "";
+        var firstName = "";
+        var lastName = "";
 
         do
         {
             try
             {
-                 firstName = InputValidator.GetValidatedInput(
+                firstName = InputValidator.GetValidatedInput(
                     "Enter first name: ",
                     input => !string.IsNullOrWhiteSpace(input),
                     "First name cannot be empty",
-                    isRequired: true
+                    true
                 );
 
-                 lastName = InputValidator.GetValidatedInput(
+                lastName = InputValidator.GetValidatedInput(
                     "Enter last name: ",
                     input => !string.IsNullOrWhiteSpace(input),
                     "Last name cannot be empty",
-                    isRequired: true
+                    true
                 );
 
                 name = firstName + lastName;
-                if (contacts.ContainsContact(name))
-                {
-                    throw new DuplicateContactException(name);
-                }
+                if (contacts.ContainsContact(name)) throw new DuplicateContactException(name);
             }
-            catch(DuplicateContactException ex)
+            catch (DuplicateContactException ex)
             {
                 Console.WriteLine(ex.Message);
             }
         } while (contacts.ContainsContact(name));
-        
-        string phoneNumber = InputValidator.GetValidatedInput(
+
+        var phoneNumber = InputValidator.GetValidatedInput(
             "Enter phone number: ",
-            new[] {
-                ((Func<string, bool>)(input => !string.IsNullOrWhiteSpace(input)), "Phone number cannot be empty"),
+            new[]
+            {
+                (input => !string.IsNullOrWhiteSpace(input), "Phone number cannot be empty"),
                 ((Func<string, bool>)(input => InputValidator.PhoneRegex.IsMatch(input)), "Phone number is invalid")
-            },
-            isRequired: true
+            }
         );
-        
-        string email = InputValidator.GetValidatedInput(
+
+        var email = InputValidator.GetValidatedInput(
             "Enter email: ",
-             new[] {
+            new[]
+            {
                 ((Func<string, bool>)(input => InputValidator.EmailRegex.IsMatch(input)), "Email is invalid")
             },
-            isRequired: false
+            false
         );
-        
+
         Console.Write("Enter address: ");
-        string address = Console.ReadLine() ?? "";
-        
-        Console.Write("Enter city: ");
-        string city = Console.ReadLine() ?? "";
-        
-        Console.Write("Enter state: ");
-        string state = Console.ReadLine() ?? "";
-        
-        Console.Write("Enter zip: ");
-        string zip = Console.ReadLine() ?? "";
-        
+        var address = Console.ReadLine() ?? "";
+
+        var city = InputValidator.GetValidatedInput(
+            "Enter city: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "City cannot be empty",
+            true
+        );
+
+        var state = InputValidator.GetValidatedInput(
+            "Enter state: ",
+            input => !string.IsNullOrWhiteSpace(input),
+            "State cannot be empty",
+            true
+        );
+
+        var zip = InputValidator.GetValidatedInput(
+            "Enter zip: ",
+            new[]
+            {
+                ((Func<string, bool>)(input => InputValidator.ZipRegex.IsMatch(input)), "Zip is invalid")
+            },
+            false
+        );
+
         return new Contact(firstName, lastName, phoneNumber, email, address, city, state, zip);
     }
 
-    static void OpenAddressBook(IContactManager contacts)
+    private static void OpenAddressBook(IContactManager contacts)
     {
         char choice;
         do
@@ -136,7 +169,7 @@ class Program
                     MenuManager.PrintWelcomeScreen();
                     try
                     {
-                        Contact newContact = CollectContactInformation(contacts);
+                        var newContact = CollectContactInformation(contacts);
                         contacts.AddContact(newContact);
                         AddressBookService.AddContactByCityAndState(newContact);
                     }
@@ -144,18 +177,15 @@ class Program
                     {
                         Console.WriteLine($"Error adding contact: {ex.Message}");
                     }
+
                     break;
                 case '2':
                     Console.Clear();
                     MenuManager.PrintWelcomeScreen();
                     if (contacts.IsEmpty())
-                    {
                         Console.WriteLine("Contact Not Created!");
-                    }
                     else
-                    {
                         TablePrinter.PrintContacts(contacts);
-                    }
                     Console.WriteLine("\n\nPress any key to continue");
                     Console.ReadKey();
                     break;
@@ -168,18 +198,18 @@ class Program
                     }
                     else
                     {
-                        string firstName = InputValidator.GetValidatedInput(
+                        var firstName = InputValidator.GetValidatedInput(
                             "Enter first name: ",
                             input => !string.IsNullOrWhiteSpace(input),
                             "First name cannot be empty",
-                            isRequired: true
+                            true
                         );
 
-                        string lastName = InputValidator.GetValidatedInput(
+                        var lastName = InputValidator.GetValidatedInput(
                             "Enter last name: ",
                             input => !string.IsNullOrWhiteSpace(input),
                             "Last name cannot be empty",
-                            isRequired: true
+                            true
                         );
 
                         if (contacts.TryGetContact(firstName + lastName, out var contact))
@@ -192,6 +222,7 @@ class Program
                             Console.WriteLine("Contact Not found!");
                         }
                     }
+
                     Console.WriteLine("\n\nPress any key to continue");
                     Console.ReadKey();
                     break;
@@ -205,23 +236,23 @@ class Program
                     }
                     else
                     {
-                        string firstName = InputValidator.GetValidatedInput(
+                        var firstName = InputValidator.GetValidatedInput(
                             "Enter first name: ",
                             input => !string.IsNullOrWhiteSpace(input),
                             "First name cannot be empty",
-                            isRequired: true
+                            true
                         );
 
-                        string lastName = InputValidator.GetValidatedInput(
+                        var lastName = InputValidator.GetValidatedInput(
                             "Enter last name: ",
                             input => !string.IsNullOrWhiteSpace(input),
                             "Last name cannot be empty",
-                            isRequired: true
+                            true
                         );
 
-                        try 
+                        try
                         {
-                            Contact deletedContact = contacts.DeleteContact(firstName + lastName);
+                            var deletedContact = contacts.DeleteContact(firstName + lastName);
                             AddressBookService.RemoveContactByCityAndState(deletedContact);
                             Console.WriteLine("Contact Deleted!");
                         }
@@ -230,6 +261,7 @@ class Program
                             Console.WriteLine(ex.Message);
                         }
                     }
+
                     Console.WriteLine("\n\nPress any key to continue");
                     Console.ReadKey();
                     break;
@@ -242,7 +274,7 @@ class Program
                     }
                     else
                     {
-                        char sortChoice = char.ToUpper(Console.ReadKey().KeyChar);
+                        var sortChoice = char.ToUpper(Console.ReadKey().KeyChar);
                         switch (sortChoice)
                         {
                             case '1':
@@ -262,11 +294,12 @@ class Program
                                 Console.WriteLine("\nSorted by Zip!");
                                 break;
                             case 'Q':
-                                break; 
+                                break;
                             default:
                                 Console.WriteLine("\nInvalid Option");
                                 break;
                         }
+
                         if (sortChoice != 'Q')
                         {
                             TablePrinter.PrintContacts(contacts);
@@ -274,6 +307,7 @@ class Program
                             Console.ReadKey();
                         }
                     }
+
                     break;
                 case 'Q':
                     break;
@@ -286,23 +320,17 @@ class Program
         } while (choice != 'Q');
     }
 
-    static void SearchContactsByCityOrState(string? city, string? state)
+    private static void SearchContactsByCityOrState(string? city, string? state)
     {
         var searchResults = new List<Contact>();
         if (city != null && state != null)
         {
-            var results = new  List<Contact>();
+            var results = new List<Contact>();
             AddressBookService.StateDictionary.TryGetValue(state.ToLower(), out results);
             if (results != null && results.Count > 0)
-            {
                 foreach (var result in results)
-                {
                     if (result.City.Equals(city, StringComparison.InvariantCultureIgnoreCase))
-                    {
                         searchResults.Add(result);
-                    }
-                }
-            }
         }
         else
         {
@@ -310,32 +338,26 @@ class Program
             {
                 var cityResults = new List<Contact>();
                 AddressBookService.CityDictionary.TryGetValue(city.ToLower(), out cityResults);
-                if (cityResults != null && cityResults.Count > 0)
-                {
-                    searchResults.AddRange(cityResults);
-                }
+                if (cityResults != null && cityResults.Count > 0) searchResults.AddRange(cityResults);
             }
 
             if (state != null)
             {
                 var stateResults = new List<Contact>();
                 AddressBookService.StateDictionary.TryGetValue(state.ToLower(), out stateResults);
-                if (stateResults != null && stateResults.Count > 0)
-                {
-                    searchResults.AddRange(stateResults);
-                }
+                if (stateResults != null && stateResults.Count > 0) searchResults.AddRange(stateResults);
             }
         }
+
         TablePrinter.PrintContacts(searchResults);
     }
 
-    static void CreateAddressBook()
+    private static void CreateAddressBook()
     {
         while (true)
-        {
             try
             {
-                string addressBookName = InputValidator.GetValidatedInput(
+                var addressBookName = InputValidator.GetValidatedInput(
                     "Enter address book name: ",
                     input => !string.IsNullOrWhiteSpace(input),
                     "Address Book name cannot be empty.",
@@ -350,35 +372,12 @@ class Program
             {
                 Console.WriteLine(ex.Message);
             }
-        }
     }
-    
-    static void Main()
+
+    private static async Task Main()
     {
-        ContactManager contacts1 = new ContactManager();
-        Contact contact1 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
-            "Jalpaiguri", "West Bengal", "735223");
-        contacts1.AddContact(contact1);
-        AddressBookService.AddContactByCityAndState(contact1);
-        
-        Contact contact2 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
-            "Bihar", "800001");
-        contacts1.AddContact(contact2);
-        AddressBookService.AddContactByCityAndState(contact2);
-        
-        ContactManager contacts2 = new ContactManager();
-        Contact contact3 = new Contact("Naman", "Singh", "+917908254373", "nvsingh2001@hotmail.com", "Matelli Bazar",
-            "Jalpaiguri", "West Bengal", "735223");
-        contacts2.AddContact(contact3);
-        AddressBookService.AddContactByCityAndState(contact3);
-        Contact contact4 = new Contact("Ankit", "Kumar", "+91790825425", "ankitkumar25@gmail.com", "Bihar", "Bihar",
-            "Bihar", "800001");
-        contacts2.AddContact(contact4);
-        AddressBookService.AddContactByCityAndState(contact4);
-        
-        AddressBookService.AddAddressBook("addressbook1", contacts1);
-        AddressBookService.AddAddressBook("addressbook2", contacts2);
-        
+        await AddressBookService.LoadDataAsync();
+
         do
         {
             MenuManager.MainMenu();
@@ -391,16 +390,12 @@ class Program
                 case 'B':
                     MenuManager.PrintWelcomeScreen();
                     if (AddressBookService.IsEmpty())
-                    {
                         Console.WriteLine("No Address Books created!");
-                    }
                     else
-                    {
-                         while (true) 
-                         {
+                        while (true)
                             try
                             {
-                                string addressBookName = InputValidator.GetValidatedInput(
+                                var addressBookName = InputValidator.GetValidatedInput(
                                     "Enter address book name: ",
                                     input => !string.IsNullOrWhiteSpace(input),
                                     "Address Book name cannot be empty",
@@ -413,8 +408,7 @@ class Program
                             {
                                 Console.WriteLine(ex.Message);
                             }
-                         }
-                    }
+
                     break;
                 case 'C':
                     MenuManager.SearchContactsMenu();
@@ -438,13 +432,13 @@ class Program
                             ));
                             break;
                         case '3':
-                            string cityName = InputValidator.GetValidatedInput(
+                            var cityName = InputValidator.GetValidatedInput(
                                 "Enter city name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "City name cannot be empty",
                                 true
                             );
-                            string stateName = InputValidator.GetValidatedInput(
+                            var stateName = InputValidator.GetValidatedInput(
                                 "Enter State name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "State name cannot be empty",
@@ -459,62 +453,68 @@ class Program
                             Console.ReadKey();
                             break;
                     }
-                    if(char.ToUpper(Console.ReadKey().KeyChar) != 'Q')
+
+                    if (char.ToUpper(Console.ReadKey().KeyChar) != 'Q')
                     {
                         Console.WriteLine("\n\nPress any key to continue");
                         Console.ReadKey();
                     }
+
                     break;
                 case 'D':
                     MenuManager.GetCountOfContactsMenu();
                     switch (char.ToUpper(Console.ReadKey().KeyChar))
                     {
                         case '1':
-                            string cityName = InputValidator.GetValidatedInput(
+                            var cityName = InputValidator.GetValidatedInput(
                                 "Enter city name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "City name cannot be empty",
                                 true
                             );
-                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(cityName,null)}");
+                            Console.WriteLine(
+                                $"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(cityName, null)}");
                             Console.WriteLine("Press any key to continue");
                             Console.ReadKey();
                             break;
                         case '2':
-                            string stateName = InputValidator.GetValidatedInput(
+                            var stateName = InputValidator.GetValidatedInput(
                                 "Enter State name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "State name cannot be empty",
                                 true
                             );
-                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(null,stateName)}");
+                            Console.WriteLine(
+                                $"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(null, stateName)}");
                             Console.WriteLine("Press any key to continue");
                             Console.ReadKey();
                             break;
                         case '3':
-                            string state = InputValidator.GetValidatedInput(
+                            var state = InputValidator.GetValidatedInput(
                                 "Enter State name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "State name cannot be empty",
                                 true
                             );
-                            string city = InputValidator.GetValidatedInput(
+                            var city = InputValidator.GetValidatedInput(
                                 "Enter city name: ",
                                 input => !string.IsNullOrWhiteSpace(input),
                                 "City name cannot be empty",
                                 true
                             );
-                            Console.WriteLine($"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(city,state)}");
+                            Console.WriteLine(
+                                $"Number of Contacts: {AddressBookService.GetCountOfContactByCityAndState(city, state)}");
                             Console.WriteLine("Press any key to continue");
                             Console.ReadKey();
                             break;
-                         case 'Q':
+                        case 'Q':
                             break;
-                         default:
+                        default:
                             Console.WriteLine("\nInvalid Option");
                             Console.ReadKey();
                             break;
                     }
+
                     break;
                 case 'E':
                     if (AddressBookService.IsEmpty())
@@ -528,16 +528,17 @@ class Program
                         Console.WriteLine("\n\nPress any key to continue");
                         Console.ReadKey();
                     }
+
                     break;
                 case 'Q':
+                    await AddressBookService.SaveDataAsync();
                     Environment.Exit(0);
                     break;
                 default:
                     Console.WriteLine("\nInvalid Input");
                     Console.WriteLine("Press any key to continue . . . ");
                     Console.ReadKey();
-                    break;
-            }
-        }while(true);
+                    break; }
+        } while (true);
     }
 }

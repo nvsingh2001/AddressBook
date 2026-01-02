@@ -22,7 +22,7 @@ public static class TablePrinter
         const int stateWidth = 20;
         const int zipWidth = 8;
 
-        int totalWidth = firstNameWidth + lastNameWidth + phoneWidth + emailWidth + 
+        var totalWidth = firstNameWidth + lastNameWidth + phoneWidth + emailWidth +
                          addressWidth + cityWidth + stateWidth + zipWidth + 17;
 
         Console.Clear();
@@ -30,29 +30,27 @@ public static class TablePrinter
         Console.WriteLine("╔" + new string('═', totalWidth) + "╗");
 
         Console.WriteLine("║ " +
-            PadRight("First Name", firstNameWidth) + "│ " +
-            PadRight("Last Name", lastNameWidth) + "│ " +
-            PadRight("Phone", phoneWidth) + "│ " +
-            PadRight("Email", emailWidth) + "│ " +
-            PadRight("Address", addressWidth) + "│ " +
-            PadRight("City", cityWidth) + "│ " +
-            PadRight("State", stateWidth) + "│ " +
-            PadRight("Zip", zipWidth) + "  ║");
+                          PadRight("First Name", firstNameWidth) + "│ " +
+                          PadRight("Last Name", lastNameWidth) + "│ " +
+                          PadRight("Phone", phoneWidth) + "│ " +
+                          PadRight("Email", emailWidth) + "│ " +
+                          PadRight("Address", addressWidth) + "│ " +
+                          PadRight("City", cityWidth) + "│ " +
+                          PadRight("State", stateWidth) + "│ " +
+                          PadRight("Zip", zipWidth) + "  ║");
 
         Console.WriteLine("╠" + new string('═', totalWidth) + "╣");
 
         foreach (var contact in contactList)
-        {
             Console.WriteLine("║ " +
-                PadRight(Truncate(contact.FirstName, firstNameWidth), firstNameWidth) + "│ " +
-                PadRight(Truncate(contact.LastName, lastNameWidth), lastNameWidth) + "│ " +
-                PadRight(Truncate(contact.Phone, phoneWidth), phoneWidth) + "│ " +
-                PadRight(Truncate(contact.Email, emailWidth), emailWidth) + "│ " +
-                PadRight(Truncate(contact.Address, addressWidth), addressWidth) + "│ " +
-                PadRight(Truncate(contact.City, cityWidth), cityWidth) + "│ " +
-                PadRight(Truncate(contact.State, stateWidth), stateWidth) + "│ " +
-                PadRight(Truncate(contact.Zip, zipWidth), zipWidth) + "  ║");
-        }
+                              PadRight(Truncate(contact.FirstName, firstNameWidth), firstNameWidth) + "│ " +
+                              PadRight(Truncate(contact.LastName, lastNameWidth), lastNameWidth) + "│ " +
+                              PadRight(Truncate(contact.Phone, phoneWidth), phoneWidth) + "│ " +
+                              PadRight(Truncate(contact.Email, emailWidth), emailWidth) + "│ " +
+                              PadRight(Truncate(contact.Address, addressWidth), addressWidth) + "│ " +
+                              PadRight(Truncate(contact.City, cityWidth), cityWidth) + "│ " +
+                              PadRight(Truncate(contact.State, stateWidth), stateWidth) + "│ " +
+                              PadRight(Truncate(contact.Zip, zipWidth), zipWidth) + "  ║");
 
         Console.WriteLine("╚" + new string('═', totalWidth) + "╝");
         Console.WriteLine($"\nTotal contacts: {contactList.Count}");
@@ -66,9 +64,9 @@ public static class TablePrinter
             Console.WriteLine("No Address Books found.");
             return;
         }
-        
+
         const int nameWidth = 40;
-        int totalWidth = nameWidth + 2;
+        var totalWidth = nameWidth + 2;
 
         Console.Clear();
         MenuManager.PrintWelcomeScreen();
@@ -76,10 +74,7 @@ public static class TablePrinter
         Console.WriteLine("║ " + PadRight("Address Book Name", nameWidth) + " ║");
         Console.WriteLine("╠" + new string('═', totalWidth) + "╣");
 
-        foreach (var name in names)
-        {
-            Console.WriteLine("║ " + PadRight(Truncate(name, nameWidth), nameWidth) + " ║");
-        }
+        foreach (var name in names) Console.WriteLine("║ " + PadRight(Truncate(name, nameWidth), nameWidth) + " ║");
         Console.WriteLine("╚" + new string('═', totalWidth) + "╝");
         Console.WriteLine($"\nTotal Address Books: {names.Count}");
     }
@@ -88,7 +83,7 @@ public static class TablePrinter
     {
         if (string.IsNullOrEmpty(value))
             return "";
-        
+
         return value.Length <= maxLength ? value : value.Substring(0, maxLength - 2) + "..";
     }
 
@@ -96,7 +91,7 @@ public static class TablePrinter
     {
         if (string.IsNullOrEmpty(value))
             return new string(' ', width);
-        
+
         return value.PadRight(width);
     }
 }

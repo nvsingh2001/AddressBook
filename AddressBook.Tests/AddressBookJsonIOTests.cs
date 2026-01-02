@@ -1,0 +1,71 @@
+using AddressBook.Utilities.FileHandling.Json;
+
+namespace AddressBook.Tests;
+using AddressBook.Services;
+using AddressBook.Utilities.FileHandling;
+using AddressBook.Models;
+
+[TestFixture]
+public class AddressBookJsonIOTests
+{
+    
+    private string _tempFilePath;
+    private AddressBookService _service;
+    private AddressBookJsonIo _addressBookIo;
+
+    [SetUp]
+    public void Setup()
+    {
+        _tempFilePath = Path.GetTempFileName();
+        _service = new AddressBookService();
+        _addressBookIo = new AddressBookJsonIo();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (File.Exists(_tempFilePath))
+        {
+            File.Delete(_tempFilePath);
+        }
+    }
+    
+    
+    [Test]
+    public void WriteAndReadTextFile_ShouldPersistDataCorrectly()
+    {
+        // Arrange
+        string bookName = "TestBook";
+        var contact = new Contact(
+            "John", "Doe", "1234567890", "john@example.com", 
+            "123 Main St", "New York", "NY", "10001"
+        );
+        
+        var manager = new ContactManager();
+        manager.AddContact(contact);
+        _service.AddAddressBook(bookName, manager);
+        _service.AddContactByCityAndState(contact);
+
+        // Act - Write
+        _addressBookIo.WriteToTextFile(_service, _tempFilePath);
+
+        // Assert - File Exists
+        Assert.That(File.Exists(_tempFilePath), Is.True);
+
+        // Act - Read into new service
+        var newService = new AddressBookService();
+        _addressBookIo.ReadFromTextFile(newService, _tempFilePath);
+
+        // Assert - Verify Data
+        Assert.That(newService.ContainsAddressBook(bookName), Is.True);
+        var loadedManager = newService.GetAddressBook(bookName);
+        Assert.That(loadedManager.ContainsContact("JohnDoe"), Is.True);
+        
+        loadedManager.TryGetContact("JohnDoe", out Contact loadedContact);
+        Assert.That(loadedContact.Phone, Is.EqualTo("1234567890"));
+        Assert.That(loadedContact.City, Is.EqualTo("New York"));
+
+        // Verify City/State dictionaries populated (if logic added to ReadFromTextFile)
+        Assert.That(newService.GetCountOfContactByCityAndState("New York", null), Is.EqualTo(1));
+    }
+}
