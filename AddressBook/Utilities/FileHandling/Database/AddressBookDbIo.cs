@@ -23,10 +23,6 @@ public class AddressBookDbIo : IAddressBookIo
 
         foreach (var book in addressBookService.AddressBooks)
         {
-            // Upsert AddressBook
-            // Note: This is a simplified logic. In production, use MERGE or stored procedures.
-            // For this implementation, we'll check if it exists, insert if not, and get ID.
-            
             var addressBookId = await GetOrCreateAddressBookId(connection, book.Key);
 
             foreach (var contact in book.Value)
