@@ -16,7 +16,7 @@ public class AddressBookIOTests
     {
         _tempFilePath = Path.GetTempFileName();
         _service = new AddressBookService();
-        _addressBookIO = new AddressBookIO();
+        _addressBookIO = new AddressBookIO(_tempFilePath);
     }
 
     [TearDown]
@@ -29,7 +29,7 @@ public class AddressBookIOTests
     }
 
     [Test]
-    public void WriteAndReadTextFile_ShouldPersistDataCorrectly()
+    public async Task WriteAndReadTextFile_ShouldPersistDataCorrectly()
     {
         // Arrange
         string bookName = "TestBook";
@@ -44,14 +44,14 @@ public class AddressBookIOTests
         _service.AddContactByCityAndState(contact);
 
         // Act - Write
-        _addressBookIO.WriteToTextFile(_service, _tempFilePath);
+        await _addressBookIO.SaveDataAsync(_service);
 
         // Assert - File Exists
         Assert.That(File.Exists(_tempFilePath), Is.True);
 
         // Act - Read into new service
         var newService = new AddressBookService();
-        _addressBookIO.ReadFromTextFile(newService, _tempFilePath);
+        await _addressBookIO.LoadDataAsync(newService);
 
         // Assert - Verify Data
         Assert.That(newService.ContainsAddressBook(bookName), Is.True);

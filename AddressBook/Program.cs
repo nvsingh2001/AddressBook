@@ -4,12 +4,17 @@ using AddressBook.Models;
 using AddressBook.Services;
 using AddressBook.Services.Interfaces;
 using AddressBook.UI;
+using AddressBook.Utilities.FileHandling;
+using AddressBook.Utilities.FileHandling.Csv;
+using AddressBook.Utilities.FileHandling.Database;
+using AddressBook.Utilities.FileHandling.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace AddressBook;
 
 internal class Program
 {
-    private static readonly IAddressBookService AddressBookService = new AddressBookService();
+    private static IAddressBookService AddressBookService = null!;
 
     private static void EditContactField(Contact contact, int choice)
     {
@@ -376,6 +381,22 @@ internal class Program
 
     private static async Task Main()
     {
+        var builder = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+        IConfiguration configuration = builder.Build();
+
+        AddressBookService = new AddressBookService(
+            new List<IAddressBookIo>
+            {
+                new AddressBookIO(configuration["FilePaths:Text"]),
+                new AddressBookCsvIO(configuration["FilePaths:Csv"]),
+                new AddressBookJsonIo(configuration["FilePaths:Json"]),
+                new AddressBookDbIo(configuration["ConnectionStrings:AddressBookDb"])
+            }
+        );
+
         await AddressBookService.LoadDataAsync();
 
         do

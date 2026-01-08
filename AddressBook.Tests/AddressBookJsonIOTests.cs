@@ -18,7 +18,7 @@ public class AddressBookJsonIOTests
     {
         _tempFilePath = Path.GetTempFileName();
         _service = new AddressBookService();
-        _addressBookIo = new AddressBookJsonIo();
+        _addressBookIo = new AddressBookJsonIo(_tempFilePath);
     }
 
     [TearDown]
@@ -32,7 +32,7 @@ public class AddressBookJsonIOTests
     
     
     [Test]
-    public void WriteAndReadTextFile_ShouldPersistDataCorrectly()
+    public async Task WriteAndReadTextFile_ShouldPersistDataCorrectly()
     {
         // Arrange
         string bookName = "TestBook";
@@ -47,14 +47,14 @@ public class AddressBookJsonIOTests
         _service.AddContactByCityAndState(contact);
 
         // Act - Write
-        _addressBookIo.WriteToTextFile(_service, _tempFilePath);
+        await _addressBookIo.SaveDataAsync(_service);
 
         // Assert - File Exists
         Assert.That(File.Exists(_tempFilePath), Is.True);
 
         // Act - Read into new service
         var newService = new AddressBookService();
-        _addressBookIo.ReadFromTextFile(newService, _tempFilePath);
+        await _addressBookIo.LoadDataAsync(newService);
 
         // Assert - Verify Data
         Assert.That(newService.ContainsAddressBook(bookName), Is.True);

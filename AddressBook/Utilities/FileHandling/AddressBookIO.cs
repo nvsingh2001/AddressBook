@@ -8,20 +8,32 @@ public class AddressBookIO : IAddressBookIo
 {
     private const string AddressBookDelimiter = "###ADDRESSBOOK:";
     private const string ContactFieldDelimiter = ",";
+    private readonly string _filePath;
 
-    public Dictionary<string, List<Contact>> ExtractData(AddressBookService addressBookService)
+    public AddressBookIO(string filePath)
+    {
+        _filePath = filePath;
+    }
+
+    private Dictionary<string, List<Contact>> ExtractData(AddressBookService addressBookService)
     {
        return addressBookService.AddressBooks.ToDictionary(book => book.Key,
             book => book.Value.ToList());
     }
 
-    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task SaveDataAsync(AddressBookService addressBookService)
     {
-        using var writer = new StreamWriter(path);
+        var directory = Path.GetDirectoryName(_filePath);
+        if (directory != null && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var writer = new StreamWriter(_filePath);
         var data = ExtractData(addressBookService);
         foreach (var book in data)
         {
-            writer.WriteLine($"{AddressBookDelimiter}{book.Key}");
+            await writer.WriteLineAsync($"{AddressBookDelimiter}{book.Key}");
             foreach (var contact in book.Value)
             {
                 var line = string.Join(ContactFieldDelimiter,
@@ -32,11 +44,11 @@ public class AddressBookIO : IAddressBookIo
         }
     }
 
-    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task LoadDataAsync(AddressBookService addressBookService)
     {
-        if (!File.Exists(path)) return;
+        if (!File.Exists(_filePath)) return;
 
-        using var reader = new StreamReader(path);
+        using var reader = new StreamReader(_filePath);
         string? line;
         ContactManager? currentManager = null;
 
