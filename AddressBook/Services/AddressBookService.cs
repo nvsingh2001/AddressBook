@@ -9,14 +9,16 @@ namespace AddressBook.Services;
 
 public class AddressBookService : IAddressBookService
 {
-    // private readonly IAddressBookIo _addressBookIo = new AddressBookCsvIO();
-    private readonly IAddressBookIo _addressBookIoJson = new AddressBookJsonIo();
-    private readonly IAddressBookIo _addressBookIoCsv = new AddressBookCsvIO();
-    private readonly IAddressBookIo _addressBookIo = new AddressBookIO();
+    private readonly IEnumerable<IAddressBookIo> _ioStrategies;
 
-    private const string DataFilePathText = "Data/addressbook.txt";
-    private const string DataFilePathJson = "Data/addressbook.json";
-    private const string DataFilePathCsv = "Data/addressbook.csv";
+    public AddressBookService(IEnumerable<IAddressBookIo> ioStrategies)
+    {
+        _ioStrategies = ioStrategies;
+    }
+    
+    public AddressBookService() : this(new List<IAddressBookIo>())
+    {
+    }
 
     public Dictionary<string, ContactManager> AddressBooks { get; } = new();
     public Dictionary<string, List<Contact>> CityDictionary { get; } = new();
@@ -108,21 +110,17 @@ public class AddressBookService : IAddressBookService
 
     public async Task SaveDataAsync()
     {
-        var directory = Path.GetDirectoryName(DataFilePathText);
-        if (directory != null && !Directory.Exists(directory))
+        foreach (var strategy in _ioStrategies)
         {
-            Directory.CreateDirectory(directory);
+            await strategy.SaveDataAsync(this);
         }
-        await _addressBookIo.WriteToTextFile(this, DataFilePathText);
-        await _addressBookIoCsv.WriteToTextFile(this, DataFilePathCsv);
-        await _addressBookIoJson.WriteToTextFile(this, DataFilePathJson);
     }
 
     public async Task LoadDataAsync()
     {
-        if (File.Exists(DataFilePathText))
+        foreach (var strategy in _ioStrategies)
         {
-            await _addressBookIoJson.ReadFromTextFile(this, DataFilePathJson);
+            await strategy.LoadDataAsync(this);
         }
     }
 }

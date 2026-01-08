@@ -7,6 +7,13 @@ namespace AddressBook.Utilities.FileHandling.Json;
 
 public class AddressBookJsonIo: IAddressBookIo
 {
+    private readonly string _filePath;
+
+    public AddressBookJsonIo(string filePath)
+    {
+        _filePath = filePath;
+    }
+
     private class ContactJsonModel
     {
         public string FirstName { get; set; } = string.Empty;
@@ -19,14 +26,7 @@ public class AddressBookJsonIo: IAddressBookIo
         public string Zip { get; set; } = string.Empty;
     }
     
-    public Dictionary<string, List<Contact>> ExtractData(AddressBookService addressBookService)
-    {
-        return addressBookService.AddressBooks.ToDictionary(book => book.Key,
-            book => book.Value.ToList());
-    }
-    
-    
-    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task SaveDataAsync(AddressBookService addressBookService)
     {
         var data = addressBookService.AddressBooks
             .ToDictionary(
@@ -50,57 +50,70 @@ public class AddressBookJsonIo: IAddressBookIo
         {
             WriteIndented = true
         };
+
+        var directory = Path.GetDirectoryName(_filePath);
+        if (directory != null && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
         
-        await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+        await using var fs = new FileStream(_filePath, FileMode.Create, FileAccess.Write);
         await JsonSerializer.SerializeAsync(fs, data, options);
     }
     
     
-    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task LoadDataAsync(AddressBookService addressBookService)
     {
-        if (!File.Exists(path)) return;
+        if (!File.Exists(_filePath)) return;
 
-        var json = File.OpenRead(path);
+        var json = File.OpenRead(_filePath);
 
-        var data = await JsonSerializer.DeserializeAsync<
-            Dictionary<string, List<ContactJsonModel>>
-        >(json);
-
-        if (data == null) return;
-
-        foreach (var (bookName, contacts) in data)
+        try
         {
-            ContactManager manager;
+            var data = await JsonSerializer.DeserializeAsync<
+                Dictionary<string, List<ContactJsonModel>>
+            >(json);
 
-            if (!addressBookService.ContainsAddressBook(bookName))
-            {
-                manager = new ContactManager();
-                addressBookService.AddAddressBook(bookName, manager);
-            }
-            else
-            {
-                manager = addressBookService.GetAddressBook(bookName);
-            }
+            if (data == null) return;
 
-            foreach (var record in contacts)
+            foreach (var (bookName, contacts) in data)
             {
-                var contact = new Contact(
-                    record.FirstName,
-                    record.LastName,
-                    record.Phone,
-                    record.Email,
-                    record.Address,
-                    record.City,
-                    record.State,
-                    record.Zip
-                );
+                ContactManager manager;
 
-                if (!manager.ContainsContact(contact.FirstName + contact.LastName))
+                if (!addressBookService.ContainsAddressBook(bookName))
                 {
-                    manager.AddContact(contact);
-                    addressBookService.AddContactByCityAndState(contact);
+                    manager = new ContactManager();
+                    addressBookService.AddAddressBook(bookName, manager);
+                }
+                else
+                {
+                    manager = addressBookService.GetAddressBook(bookName);
+                }
+
+                foreach (var record in contacts)
+                {
+                    var contact = new Contact(
+                        record.FirstName,
+                        record.LastName,
+                        record.Phone,
+                        record.Email,
+                        record.Address,
+                        record.City,
+                        record.State,
+                        record.Zip
+                    );
+
+                    if (!manager.ContainsContact(contact.FirstName + contact.LastName))
+                    {
+                        manager.AddContact(contact);
+                        addressBookService.AddContactByCityAndState(contact);
+                    }
                 }
             }
+        }
+        catch (JsonException)
+        {
+            // Handle empty or invalid JSON
         }
     }
 }

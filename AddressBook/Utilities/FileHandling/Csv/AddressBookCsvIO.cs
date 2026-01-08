@@ -8,6 +8,13 @@ namespace AddressBook.Utilities.FileHandling.Csv;
 
 public class AddressBookCsvIO : IAddressBookIo
 {
+    private readonly string _filePath;
+
+    public AddressBookCsvIO(string filePath)
+    {
+        _filePath = filePath;
+    }
+
     private class ContactCsvModel
     {
         public string AddressBookName { get; set; } = string.Empty;
@@ -21,13 +28,7 @@ public class AddressBookCsvIO : IAddressBookIo
         public string Zip { get; set; } = string.Empty;
     }
 
-    public Dictionary<string, List<Contact>> ExtractData(AddressBookService addressBookService)
-    {
-       return addressBookService.AddressBooks.ToDictionary(book => book.Key,
-            book => book.Value.ToList());
-    }
-
-    public async Task WriteToTextFile(AddressBookService addressBookService, string path)
+    public async Task SaveDataAsync(AddressBookService addressBookService)
     {
         var data = addressBookService.AddressBooks.ToDictionary(book => book.Key, book => book.Value.ToList());
         
@@ -45,18 +46,24 @@ public class AddressBookCsvIO : IAddressBookIo
             Zip = contact.Zip
         })).ToList();
 
-        using var writer = new StreamWriter(path);
+        var directory = Path.GetDirectoryName(_filePath);
+        if (directory != null && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        using var writer = new StreamWriter(_filePath);
         using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
         await csv.WriteRecordsAsync(records);
     }
 
-    public async Task ReadFromTextFile(AddressBookService addressBookService, string path)
+    public async Task LoadDataAsync(AddressBookService addressBookService)
     {
-        if (!File.Exists(path)) return;
+        if (!File.Exists(_filePath)) return;
 
         try 
         {
-            using var reader = new StreamReader(path);
+            using var reader = new StreamReader(_filePath);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             
             var records = await csv.GetRecordsAsync<ContactCsvModel>().ToListAsync();

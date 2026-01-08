@@ -4,12 +4,24 @@ using AddressBook.Models;
 using AddressBook.Services;
 using AddressBook.Services.Interfaces;
 using AddressBook.UI;
+using AddressBook.Utilities.FileHandling;
+using AddressBook.Utilities.FileHandling.Csv;
+using AddressBook.Utilities.FileHandling.Database;
+using AddressBook.Utilities.FileHandling.Json;
 
 namespace AddressBook;
 
 internal class Program
 {
-    private static readonly IAddressBookService AddressBookService = new AddressBookService();
+    private static readonly IAddressBookService AddressBookService = new AddressBookService(
+        new List<IAddressBookIo>
+        {
+            new AddressBookIO("Data/addressbook.txt"),
+            new AddressBookCsvIO("Data/addressbook.csv"),
+            new AddressBookJsonIo("Data/addressbook.json"),
+            new AddressBookDbIo("Server=localhost;Database=AddressBook;User Id=sa; Password=Naman@#$2001; Encrypt=False;")
+        }
+    );
 
     private static void EditContactField(Contact contact, int choice)
     {

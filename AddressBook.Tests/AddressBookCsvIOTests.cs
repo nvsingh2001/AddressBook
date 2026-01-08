@@ -16,7 +16,7 @@ public class AddressBookCsvIOTests
     {
         _tempFilePath = Path.GetTempFileName();
         _service = new AddressBookService();
-        _addressBookCsvIO = new AddressBookCsvIO();
+        _addressBookCsvIO = new AddressBookCsvIO(_tempFilePath);
     }
 
     [TearDown]
@@ -29,7 +29,7 @@ public class AddressBookCsvIOTests
     }
 
     [Test]
-    public void WriteAndReadTextFile_ShouldPersistDataCorrectly()
+    public async Task WriteAndReadTextFile_ShouldPersistDataCorrectly()
     {
         // Arrange
         string bookName = "TestBook";
@@ -44,7 +44,7 @@ public class AddressBookCsvIOTests
         _service.AddContactByCityAndState(contact);
 
         // Act - Write
-        _addressBookCsvIO.WriteToTextFile(_service, _tempFilePath);
+        await _addressBookCsvIO.SaveDataAsync(_service);
 
         // Assert - File Exists
         Assert.That(File.Exists(_tempFilePath), Is.True);
@@ -56,7 +56,7 @@ public class AddressBookCsvIOTests
 
         // Act - Read into new service
         var newService = new AddressBookService();
-        _addressBookCsvIO.ReadFromTextFile(newService, _tempFilePath);
+        await _addressBookCsvIO.LoadDataAsync(newService);
 
         // Assert - Verify Data
         Assert.That(newService.ContainsAddressBook(bookName), Is.True);
